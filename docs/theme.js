@@ -23,7 +23,7 @@ const THEMES = {
 };
 function themeVars(t) { return Object.entries(t).filter(([k]) => k !== 'name' && k !== 'note' && k !== 'mode').map(([k, v]) => `--${k}:${v}`).join(';'); }
 function applyTheme(key, node) {
-  const t = THEMES[key] || THEMES.forest, root = node || document.documentElement;
+  const t = THEMES[key] || THEMES.porcelain, root = node || document.documentElement;
   root.setAttribute('style', themeVars(t)); root.setAttribute('data-mode', t.mode); if (!node) document.documentElement.style.colorScheme = t.mode;
   return t;
 }

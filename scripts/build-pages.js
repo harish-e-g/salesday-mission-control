@@ -10,6 +10,8 @@ const snap = state(); snap.liveVersion = '1.0.0';
 fs.writeFileSync(path.join(out, 'demo-state.json'), JSON.stringify(snap));
 for (const f of ['index.html', 'theme.js', 'widgets.js', 'widgets.css', 'themes.html']) fs.copyFileSync(path.join(root, 'public', f), path.join(out, f));
 fs.mkdirSync(path.join(out, 'brand'), { recursive: true });
+fs.mkdirSync(path.join(out, 'fonts'), { recursive: true });
+for (const f of fs.readdirSync(path.join(root, 'public', 'fonts'))) fs.copyFileSync(path.join(root, 'public', 'fonts', f), path.join(out, 'fonts', f));
 for (const f of fs.readdirSync(path.join(root, 'public', 'brand'))) fs.copyFileSync(path.join(root, 'public', 'brand', f), path.join(out, 'brand', f));
 fs.writeFileSync(path.join(out, '.nojekyll'), '');
 console.log('pages built:', fs.readdirSync(out).join(', '));
