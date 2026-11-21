@@ -145,8 +145,20 @@ function state() {
 }
 
 const PAGE = () => fs.readFileSync(path.join(HERE, 'public', 'index.html'), 'utf8');
+const HOSTED = process.env.MC_HOSTED === '1', INGEST_TOKEN = process.env.MC_INGEST_TOKEN || '';
+const hosted = { state: null, stateAt: 0 };
+function ingest(q, s) {
+  const given = Buffer.from((q.headers.authorization || '').replace(/^Bearer /, '')), want = Buffer.from(INGEST_TOKEN);
+  if (!HOSTED || !INGEST_TOKEN || given.length !== want.length || !require('crypto').timingSafeEqual(given, want)) { s.statusCode = 401; return s.end(); }
+  let b = ''; q.on('data', (c) => { b += c; if (b.length > 1e6) { s.statusCode = 413; s.end(); q.destroy(); } });
+  q.on('end', () => { try { const j = JSON.parse(b); if (j.state && typeof j.state === 'object') { hosted.state = j.state; hosted.stateAt = Date.now(); } if (j.live && typeof j.live === 'object') { j.live.at = Date.now(); liveHistory.push(j.live); while (liveHistory.length > 95) liveHistory.shift(); } s.statusCode = 204; s.end(); } catch { s.statusCode = 400; s.end(); } });
+}
 const server = http.createServer((q, s) => {
+  s.setHeader('x-content-type-options', 'nosniff'); s.setHeader('referrer-policy', 'no-referrer');
+  if (q.method === 'POST' && q.url === '/ingest') return ingest(q, s);
   if (q.method !== 'GET') { s.statusCode = 405; return s.end(); }
+  if (HOSTED && q.url.startsWith('/api/state')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); if (!hosted.state) { s.statusCode = 503; return s.end('{"waiting":true}'); } return s.end(JSON.stringify(Object.assign({}, hosted.state, { stale: Date.now() - hosted.stateAt > 60000, publishedAt: hosted.stateAt }))); }
+  if (HOSTED && q.url.startsWith('/api/live') && !q.url.includes('history')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); const l = liveHistory[liveHistory.length - 1]; if (!l) { s.statusCode = 503; return s.end('{"waiting":true}'); } return s.end(JSON.stringify(l)); }
   if (q.url.startsWith('/api/live?history')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify({ history: liveHistory })); }
   if (q.url.startsWith('/api/live')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify(liveSample())); }
   if (q.url.startsWith('/api/state')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify(state())); }
@@ -155,5 +167,5 @@ const server = http.createServer((q, s) => {
   if (asset && fs.existsSync(asset)) { s.setHeader('content-type', TYPES[path.extname(asset)] || 'application/octet-stream'); s.setHeader('cache-control', 'no-store'); return s.end(fs.readFileSync(asset)); }
   s.setHeader('content-type', 'text/html; charset=utf-8'); s.setHeader('cache-control', 'no-store'); s.end(PAGE());
 });
-if (require.main === module) server.listen(PORT, '127.0.0.1', () => { sampleLoop(); setInterval(sampleLoop, 2000); console.log(`Mission Control on http://127.0.0.1:${PORT} (${DEMO || !fs.existsSync(cfgPath) ? 'demo data' : 'your data'})`); });
-module.exports = { state };
+if (require.main === module) server.listen(HOSTED ? Number(process.env.PORT) || PORT : PORT, HOSTED ? '0.0.0.0' : '127.0.0.1', () => { if (!HOSTED) { sampleLoop(); setInterval(sampleLoop, 2000); } console.log(`Mission Control on http://127.0.0.1:${PORT} (${DEMO || !fs.existsSync(cfgPath) ? 'demo data' : 'your data'})`); });
+module.exports = { state, liveSample, cfg };

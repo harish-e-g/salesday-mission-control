@@ -1,6 +1,6 @@
 # SalesDay Mission Control
 
-A real-time, glass-finished dashboard for building a product with an AI assistant. **[Live demo](https://harish-e-g.github.io/salesday-mission-control/)** (simulated data, it moves). One page tells you:
+A real-time, glass-finished dashboard for building a product with an AI assistant. **[Live](https://mission-control-production-f6bba4c5.up.railway.app)** (simulated data, it moves). One page tells you:
 
 - **Live moving graphs**: CPU load, memory and swap scrolling in real time, an open-items stream, and a 24-hour activity curve
 - **Where we are**: done, in progress, pending a check, blocked, not started, as concentric rings
@@ -78,3 +78,8 @@ The demo data is made up. Your own rows, folders and URLs stay in `mission.confi
 ## License
 
 MIT
+
+
+## Sharing it publicly (hosted copy)
+
+`server.js` also runs as a hosted copy (`MC_HOSTED=1`, `MC_INGEST_TOKEN=<secret>`). It holds no data of its own: `scripts/publish.js` runs on the machine that has the rows, masks e-mail addresses, links, phone numbers, folder paths, keys and any terms listed under `publish.maskTerms` (see `lib/redact.js`), and posts a snapshot every 2 seconds. The secret is read from `~/.config/salesday-mission-control/token` and never committed. If the publisher stops, the page shows a "Publisher offline" notice with the time of the last update.

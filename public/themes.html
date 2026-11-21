@@ -25,7 +25,7 @@ body{margin:0;background:#0b0d0e;color:#EEF1F0;font:14px/1.45 var(--ui);padding:
 <script src="theme.js"></script><script src="widgets.js"></script>
 <script>
 const KEYS=['forest','cobalt','graphite','aubergine','porcelain'];
-async function load(){for(const u of ['demo-state.json','api/state']){try{const r=await fetch(u,{cache:'no-store'});if(r.ok)return await r.json()}catch(e){}}throw new Error('no data')}
+async function load(){for(const u of ['api/state','demo-state.json']){try{const r=await fetch(u,{cache:'no-store'});if(r.ok)return await r.json()}catch(e){}}throw new Error('no data')}
 function opt(k,i,s){
   const t=THEMES[k],d=widgetData(s),root=document.createElement('section');root.className='opt';root.setAttribute('aria-label',t.name);applyTheme(k,root);
   const logo=t.mode==='dark'?'brand/salesday-wordmark-reversed.svg':'brand/salesday-wordmark-primary.svg';

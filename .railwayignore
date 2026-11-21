@@ -1,0 +1,7 @@
+mission.config.json
+agents.json
+rows/
+.git
+node_modules
+*.log
+docs/screenshot*.png
