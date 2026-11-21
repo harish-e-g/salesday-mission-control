@@ -127,8 +127,13 @@ The `owner` field is also blanked. Masking is pattern based, so it cannot know w
 - **Quicksand**, used for interface text, is licensed under the SIL Open Font License 1.1.
 - **Codec Pro Regular**, used for headline numbers and the page title, is licensed under CC BY 4.0. Codec Pro is made available by Web Fonts (http://www.onlinewebfonts.com) under CC BY 4.0.
 
-Details are in `public/fonts/FONTS.md`. The SalesDay wordmark files in `public/brand/` are SalesDay brand assets. They are **not** covered by the MIT licence: do not reuse them without permission.
+Details are in `public/fonts/FONTS.md`. The SalesDay wordmark files and the partner logo in `public/brand/` are brand assets of their owners. They are **not** covered by the MIT licence: do not reuse them without permission.
 
 ## Licence
 
 MIT for the code. See `LICENSE`. The fonts above and the SalesDay wordmark keep their own terms.
+
+
+## Partner logo (optional)
+
+Set `"partner": { "enabled": true }` in `mission.config.json` to show a small "In partnership with" mark in the header (`public/brand/partner-logo.png`). It is off in the example config. Set it to `false` to remove it everywhere.

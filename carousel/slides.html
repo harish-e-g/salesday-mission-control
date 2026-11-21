@@ -6,7 +6,7 @@
 *{box-sizing:border-box}html,body{margin:0;background:#0b1410}
 .s{position:relative;width:1080px;height:1350px;overflow:hidden;page-break-after:always;break-after:page;color:var(--ink);font-family:var(--ui);font-size:36px;line-height:1.35;padding:84px 90px;display:flex;flex-direction:column;
  background:radial-gradient(1200px 760px at 8% -6%,var(--glow1),transparent 62%),radial-gradient(900px 700px at 105% 8%,var(--glow2),transparent 60%),linear-gradient(165deg,var(--bg1),var(--bg0) 64%)}
-.top{display:flex;justify-content:space-between;align-items:center;height:60px;flex:none}.top img{height:44px;display:block}.top .pg{font-size:26px;color:var(--ink2);font-weight:500;letter-spacing:.04em}
+.top{display:flex;justify-content:space-between;align-items:center;height:60px;flex:none}.top img{height:44px;display:block}.top .pg{font-size:24px;color:var(--ink2);font-weight:500;letter-spacing:.04em;display:flex;flex-direction:column;align-items:flex-end;gap:6px}.top .pg .pl{height:28px;width:auto;display:block}.top .pg em{font-style:normal;font-size:22px}
 .body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;min-height:0;padding:20px 0}
 .k{font-size:26px;letter-spacing:.14em;text-transform:uppercase;color:var(--a1);font-weight:600}
 h1,h2{margin:0;font-family:var(--num);font-weight:400;letter-spacing:-.015em;line-height:1.04;text-wrap:balance}h1{font-size:96px}h2{font-size:84px}
@@ -30,7 +30,7 @@ canvas{display:block;width:100%;height:340px}
 <script>
 const D=window.DATA,N=9,LOGO='../public/brand/salesday-wordmark-reversed.svg';
 const S=D.status,ai=D.courts.ai,yo=D.courts.you,sum=(c)=>c.I+c.P+c.B+c.N;
-function slide(i,html,foot){const n=document.getElementById('s'+i);applyTheme('forest',n);n.innerHTML=`<div class="top"><img src="${LOGO}" alt="SalesDay"><span class="pg">${i} / ${N}</span></div><div class="body">${html}</div><div class="foot"><span>SalesDay Mission Control</span>${i<N?'<span class="swipe">Swipe  &rarr;</span>':'<span class="swipe">Follow for the build</span>'}</div>`;return n}
+function slide(i,html,foot){const n=document.getElementById('s'+i);applyTheme('forest',n);n.innerHTML=`<div class="top"><img src="${LOGO}" alt="SalesDay"><span class="pg"><img class="pl" src="../public/brand/partner-logo.png" alt="Channel partner logo"><em>${i} / ${N}</em></span></div><div class="body">${html}</div><div class="foot"><span>SalesDay Mission Control</span>${i<N?'<span class="swipe">Swipe  &rarr;</span>':'<span class="swipe">Follow for the build</span>'}</div>`;return n}
 // 1 hook
 let n=slide(1,`<div class="k">Built in public</div><h1>I gave my AI team a mission control.</h1><p>One live page shows who is working, whose turn it is, what is blocked and when the next release lands.</p><div class="ringBox" id="r1"></div>`);
 {const o=D.open;const r=ring([{v:D.done/D.rows,color:'var(--a1)'},{v:S.I/o,color:'var(--a2)'},{v:(S.P+S.B)/o,color:'var(--a3)'},{v:S.N/o,color:'var(--a4)'}]);const m=document.createElement('div');m.className='mid';m.innerHTML=`<b>${D.open}</b><span>open items, live</span>`;n.querySelector('#r1').append(r,m)}

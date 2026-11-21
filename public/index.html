@@ -44,10 +44,11 @@ canvas.chart{display:block;width:100%;height:210px;border-radius:14px}canvas.cha
 @media(prefers-reduced-motion:reduce){.crewDots i{animation:none}}
 footer{color:var(--ink3);font-size:12px;text-align:center}
 .brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.brand img{height:30px;width:auto;display:block}.brand h1{margin:0;font-size:clamp(22px,2.8vw,30px)}
+.partner{display:inline-flex;align-items:center;gap:10px;padding-left:18px;margin-left:4px;border-left:1px solid var(--line);color:var(--ink2);font-size:13px;font-weight:500}.partner img{height:24px;width:auto;display:block}@media(max-width:700px){.partner{padding-left:0;margin-left:0;border-left:0;flex-basis:100%}}
 .swatches{display:inline-flex;gap:6px;align-items:center}.swatches button{border:1px solid var(--line);background:var(--track);padding:3px;border-radius:999px;cursor:pointer;display:inline-flex;gap:2px}.swatches button[aria-pressed=true]{outline:2px solid var(--ink);outline-offset:1px}.swatches i{width:9px;height:9px;border-radius:50%;display:block}
 </style></head>
 <body><div class="wrap">
-<header><div><div class="hi" id="hi">Hello</div><div class="brand"><img id="logo" src="brand/salesday-wordmark-reversed.svg" alt="SalesDay" height="30"><h1 id="title">Mission Control</h1></div></div><div class="pills" id="pills"></div><div class="swatches" id="themes" role="group" aria-label="Colour scheme"></div></header>
+<header><div><div class="hi" id="hi">Hello</div><div class="brand"><img id="logo" src="brand/salesday-wordmark-reversed.svg" alt="SalesDay" height="30"><h1 id="title">Mission Control</h1><span class="partner" id="partner" hidden><span>In partnership with</span><img src="brand/partner-logo.png" alt="Channel partner logo" height="24"></span></div></div><div class="pills" id="pills"></div><div class="swatches" id="themes" role="group" aria-label="Colour scheme"></div></header>
 <div class="grid">
   <section class="card c12 crew" aria-label="Agents working now" id="crew"></section>
   <section class="card tint c8" aria-label="Progress"><h2>Where we are <span class="sub" id="upd"></span></h2><div class="hero"><div class="ring" id="ring"></div><div><div class="kpi" id="kpi"></div><div class="legend" id="legend" style="margin-top:14px"></div></div></div></section>
@@ -92,7 +93,7 @@ function list(arr,withAgo){return arr.length?arr.map((r)=>rowEl(r,withAgo)):[el(
 function meter(label,val,max,fmt,warn){const m=el('div','meter');const l=el('div','l');l.append(el('span',null,label),el('b',null,fmt));const b=el('div','bar');const i=el('i');const f=max?Math.min(1,val/max):0;i.style.width=(f*100)+'%';i.style.background=warn&&f>warn?C.coral:C.mint;b.append(i);m.append(l,b);return m}
 function render(s){
   last=s;const L=s.labels;
-  $('hi').textContent=s.owner?('Hello, '+s.owner):'Hello';document.title=s.project+' Mission Control';
+  $('hi').textContent=s.owner?('Hello, '+s.owner):'Hello';document.title=s.project+' Mission Control';$('partner').hidden=!(s.partner&&s.partner.enabled);
   const pills=[];const mk=(t,c)=>{const p=el('span','pill '+(c||''));const d=el('span','dot');d.style.background=c==='ok'?'#7FE0B0':c==='watch'?'#F2D27A':c==='critical'?'#F29A8A':'#A8E6D8';p.append(d,document.createTextNode(t));return p};
   if(s.liveVersion)pills.push(mk('Live '+s.liveVersion,'ok'));pills.push(mk(s.machine.level==='ok'?'Machine healthy':s.machine.level==='watch'?'Machine busy':'Memory critical',s.machine.level));if(s.stale)pills.push(mk('Publisher offline, last update '+hhmm(s.publishedAt||s.at),'watch'));pills.push(mk(s.agents.running+(s.agents.running===1?' agent running':' agents running')));put($('pills'),pills);
   $('upd').textContent='updated '+hhmm(s.at);

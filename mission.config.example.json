@@ -102,5 +102,8 @@
     "diskFree": 482000000000,
     "level": "ok",
     "uptimeH": 19
+  },
+  "partner": {
+    "enabled": false
   }
 }
