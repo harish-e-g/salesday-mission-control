@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>SalesDay Mission Control carousel</title>
+<link rel="stylesheet" href="../public/widgets.css">
+<style>
+@page{size:1080px 1350px;margin:0}
+*{box-sizing:border-box}html,body{margin:0;background:#0b1410}
+.s{position:relative;width:1080px;height:1350px;overflow:hidden;page-break-after:always;break-after:page;color:var(--ink);font-family:var(--ui);font-size:36px;line-height:1.35;padding:84px 90px;display:flex;flex-direction:column;
+ background:radial-gradient(1200px 760px at 8% -6%,var(--glow1),transparent 62%),radial-gradient(900px 700px at 105% 8%,var(--glow2),transparent 60%),linear-gradient(165deg,var(--bg1),var(--bg0) 64%)}
+.top{display:flex;justify-content:space-between;align-items:center;height:60px;flex:none}.top img{height:44px;display:block}.top .pg{font-size:26px;color:var(--ink2);font-weight:500;letter-spacing:.04em}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;min-height:0;padding:20px 0}
+.k{font-size:26px;letter-spacing:.14em;text-transform:uppercase;color:var(--a1);font-weight:600}
+h1,h2{margin:0;font-family:var(--num);font-weight:400;letter-spacing:-.015em;line-height:1.04;text-wrap:balance}h1{font-size:96px}h2{font-size:84px}
+p{margin:0;color:var(--ink2);font-weight:500;max-width:860px}p b{color:var(--ink);font-weight:600}
+.glass{border-radius:40px;border:2px solid var(--line);padding:44px 48px;background:linear-gradient(150deg,var(--card1),var(--card2) 58%);box-shadow:inset 0 2px 0 var(--line),0 40px 80px -40px var(--shadow)}
+.glass.tint{background:linear-gradient(150deg,var(--tint1),var(--tint2) 62%,var(--card2))}
+.row{display:flex;gap:28px}.row>*{flex:1;min-width:0}
+.big{font-family:var(--num);font-size:150px;line-height:1;letter-spacing:-.02em}.lbl{font-size:28px;color:var(--ink2);font-weight:500;margin-top:10px;display:flex;align-items:center;gap:12px}.lbl i{width:18px;height:18px;border-radius:50%;display:inline-block}
+.foot{flex:none;display:flex;justify-content:space-between;align-items:center;font-size:26px;color:var(--ink3);font-weight:500;height:50px}.swipe{color:var(--a2);font-weight:600}
+.ringBox{position:relative;width:400px;aspect-ratio:1;margin:0 auto}.ringBox svg{width:100%;height:100%;transform:rotate(-90deg)}.ringBox .mid{position:absolute;inset:0;display:grid;place-content:center;text-align:center}.ringBox .mid b{font-family:var(--num);font-weight:400;font-size:120px;line-height:1}.ringBox .mid span{font-size:28px;color:var(--ink2)}
+.crewNum{font-family:var(--num);font-size:220px;line-height:.9}.dots{display:flex;flex-wrap:wrap;gap:16px;margin-top:20px}.dots i{width:34px;height:34px;border-radius:50%;background:var(--a1);display:block}.dots i.b{background:var(--a3)}
+.zoom{zoom:1.9}
+.url{font-family:var(--num);font-size:56px;color:var(--a1);word-break:break-all;line-height:1.15}
+.steps{display:grid;gap:26px}.step{display:flex;gap:30px;align-items:flex-start}.step b.n{flex:none;width:76px;height:76px;border-radius:50%;background:var(--a2);color:var(--onA2);display:grid;place-items:center;font-family:var(--num);font-weight:400;font-size:42px}.step div{font-size:36px;color:var(--ink2);font-weight:500}.step div strong{color:var(--ink);font-weight:600;display:block;font-size:42px;margin-bottom:4px}
+canvas{display:block;width:100%;height:340px}
+.mask{display:flex;flex-wrap:nowrap;gap:12px}.mask span{padding:10px 18px;border-radius:999px;background:var(--track);font-size:25px;font-weight:600;color:var(--ink);white-space:nowrap}
+.dotLegend span:last-child{display:none}
+</style></head><body>
+<section class="s" id="s1"></section><section class="s" id="s2"></section><section class="s" id="s3"></section><section class="s" id="s4"></section><section class="s" id="s5"></section><section class="s" id="s6"></section><section class="s" id="s7"></section><section class="s" id="s8"></section><section class="s" id="s9"></section>
+<script src="../public/theme.js"></script><script src="../public/widgets.js"></script>
+<script>
+const D=window.DATA,N=9,LOGO='../public/brand/salesday-wordmark-reversed.svg';
+const S=D.status,ai=D.courts.ai,yo=D.courts.you,sum=(c)=>c.I+c.P+c.B+c.N;
+function slide(i,html,foot){const n=document.getElementById('s'+i);applyTheme('forest',n);n.innerHTML=`<div class="top"><img src="${LOGO}" alt="SalesDay"><span class="pg">${i} / ${N}</span></div><div class="body">${html}</div><div class="foot"><span>SalesDay Mission Control</span>${i<N?'<span class="swipe">Swipe  &rarr;</span>':'<span class="swipe">Follow for the build</span>'}</div>`;return n}
+// 1 hook
+let n=slide(1,`<div class="k">Built in public</div><h1>I gave my AI team a mission control.</h1><p>One live page shows who is working, whose turn it is, what is blocked and when the next release lands.</p><div class="ringBox" id="r1"></div>`);
+{const o=D.open;const r=ring([{v:D.done/D.rows,color:'var(--a1)'},{v:S.I/o,color:'var(--a2)'},{v:(S.P+S.B)/o,color:'var(--a3)'},{v:S.N/o,color:'var(--a4)'}]);const m=document.createElement('div');m.className='mid';m.innerHTML=`<b>${D.open}</b><span>open items, live</span>`;n.querySelector('#r1').append(r,m)}
+// 2 problem
+slide(2,`<div class="k">The problem</div><h2>Ten agents. One question.</h2><p>When AI agents build your product in parallel, you stop seeing the work. You ask yourself the same things all day:</p><div class="glass" style="display:grid;gap:22px"><div>Who is working right now?</div><div>Whose turn is it, mine or the assistant's?</div><div>What is blocked, and for how long?</div><div>When does the next release actually ship?</div></div>`);
+// 3 answer
+n=slide(3,`<div class="k">The answer</div><h2>One page. Always live.</h2><div class="glass tint"><div class="row" style="align-items:center"><div><div class="big">${D.agents.running}</div><div class="lbl"><i style="background:var(--a1)"></i>AI agents working</div></div><div><div class="big">${D.agents.working}</div><div class="lbl"><i style="background:var(--a3)"></i>agentic sessions working</div></div></div></div><div class="glass"><div class="row"><div><div class="big" style="font-size:120px">${D.done}</div><div class="lbl"><i style="background:var(--a1)"></i>done</div></div><div><div class="big" style="font-size:120px">${S.I}</div><div class="lbl"><i style="background:var(--a2)"></i>in progress</div></div></div></div><p>Real numbers from a real product build, updating every few seconds.</p>`);
+// 4 courts
+slide(4,`<div class="k">Whose court is the ball in</div><h2>Never wonder whose turn it is.</h2><div class="glass"><div class="row" style="align-items:flex-end"><div><div class="big">${sum(ai)}</div><div class="lbl"><i style="background:var(--a1)"></i>with the AI</div></div><div><div class="big">${sum(yo)}</div><div class="lbl"><i style="background:var(--a3)"></i>with me</div></div></div><div style="height:26px;border-radius:99px;background:var(--track);display:flex;overflow:hidden;margin-top:40px"><i style="width:${sum(ai)/(sum(ai)+sum(yo))*100}%;background:var(--a1)"></i><i style="width:${sum(yo)/(sum(ai)+sum(yo))*100}%;background:var(--a3)"></i></div></div><p>Every task has an owner and a state: progressing, pending a check, blocked or not started. The page splits them in two lists, one per side.</p>`);
+// 5 agents
+n=slide(5,`<div class="k">Agents</div><h2>See the whole crew at work.</h2><div class="glass tint"><div class="row" style="align-items:flex-start"><div><div class="crewNum">${D.agents.running}</div><div class="lbl">AI agents working</div><div class="dots" id="d5a"></div></div><div><div class="crewNum">${D.agents.working}</div><div class="lbl">${D.agents.working===1?"agentic session":"agentic sessions"} working</div><div class="dots" id="d5b"></div></div></div></div><p><b>Nothing idle is the goal.</b> If a session sits idle, the page says so, and the lead puts it back to work.</p>`);
+for(let i=0;i<D.agents.running;i++){const e=document.createElement('i');n.querySelector('#d5a').append(e)}for(let i=0;i<Math.max(D.agents.working,1);i++){const e=document.createElement('i');e.className='b';n.querySelector('#d5b').append(e)}for(let i=0;i<D.agents.idle;i++){const e=document.createElement('i');e.style.background='var(--track)';n.querySelector('#d5b').append(e)}
+// 6 live graphs
+n=slide(6,`<div class="k">Live graphs</div><h2>The graph moves because the work moves.</h2><div class="glass"><canvas id="c6"></canvas><div class="lbl" style="margin-top:18px"><i style="background:var(--a1)"></i>machine load, memory and swap, scrolling every 2 seconds</div></div><p>When the build machine runs hot, the page says so before anything breaks.</p>`);
+// 7 widgets
+n=slide(7,`<div class="k">Delivery at a glance</div><h2>Every dot is a task. Every face is a day.</h2><div class="row"><div class="glass" id="w7a" style="zoom:1.35"></div><div class="glass" id="w7b" style="zoom:1.35"></div></div>`);
+// 8 how
+slide(8,`<div class="k">How it works</div><h2>Three small pieces. No heavy tools.</h2><div class="steps"><div class="step"><b class="n">1</b><div><strong>Tasks are plain files</strong>Each task is one small file: owner, priority, state, one sentence on where it stands.</div></div><div class="step"><b class="n">2</b><div><strong>A publisher sends a masked copy</strong>E-mail addresses, links, phone numbers and keys are hidden before anything leaves the machine.</div></div><div class="step"><b class="n">3</b><div><strong>One public page shows it live</strong>No login. Open the link on any phone or laptop.</div></div></div><div class="mask"><span>e-mails masked</span><span>links masked</span><span>phones masked</span><span>keys masked</span></div>`);
+// 9 CTA
+slide(9,`<div class="k">See it for yourself</div><h2>Open it. It is live right now.</h2><div class="glass tint"><div class="url">mission-control-production-f6bba4c5.up.railway.app</div></div><p>The code is open source too: <b>github.com/harish-e-g/salesday-mission-control</b></p><p><b>Which view would your team want first?</b> Tell me in the comments.</p>`);
+// widgets and canvas, after layout
+requestAnimationFrame(()=>{
+ const items=[].concat(Array(S.I).fill({kind:'progress'}),Array(S.P+S.B).fill({kind:'pending'}),Array(S.N).fill({kind:'todo'}));
+ dotMatrix(document.getElementById('w7a'),{title:'Delivery score',value:D.done,total:D.rows,items,cols:6});
+ const wk=D.week.map((w)=>w.n),mx=Math.max(...wk),mn=Math.min(...wk);
+ const days=D.week.map((w,i)=>({label:w.d,date:'',v:w.n,today:i===D.week.length-1}));
+ document.getElementById('w7b').innerHTML='<div class="wHead"><span class="wIcon">&#9786;</span><span>Mood of the week</span></div>';const strip=document.createElement('div');document.getElementById('w7b').append(strip);
+ const pts=D.week.map((w)=>({label:w.d.slice(0,2),v:Math.sqrt(w.n)}));const holder=document.createElement('div');document.getElementById('w7b').append(holder);
+ moodTracker(holder,{ranges:{Week:pts}});
+ const now=Date.now(),dd=D.week.map((w,i)=>({label:w.d.slice(0,2),date:new Date(now-(D.week.length-1-i)*864e5).getDate(),v:Math.sqrt(w.n),today:i===D.week.length-1}));
+ const st=document.createElement('div');st.style.marginTop='18px';document.getElementById('w7b').append(st);const sq=dd.map((d)=>d.v);dayStrip(st,{days:dd,max:Math.max(...sq),min:Math.min(...sq)});
+ const cap=document.createElement('div');cap.style.cssText='margin-top:14px;font-size:13px;color:var(--ink2)';cap.textContent='A face shows how busy the day was.';document.getElementById('w7b').append(cap);
+ // canvas
+ const c=document.getElementById('c6');const base=D.week.map((w)=>w.n);const v=[];for(let i=0;i<60;i++){v.push(30+22*Math.sin(i/6)+14*Math.sin(i/2.3+1)+i*.25)}sparkArea(c,v,themeColor(document.getElementById('s6'),'a1'));
+ document.body.dataset.ready='1';
+});
+</script></body></html>

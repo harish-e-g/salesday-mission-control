@@ -46,7 +46,7 @@ function dotMatrix(node, { title, value, total, items, cols }) {
   const big = wEl('div', 'wBig'); big.append(document.createTextNode(String(value)), wEl('small', null, '/' + total)); node.append(big);
   const g = wEl('div', 'dotGrid'); g.style.setProperty('--cols', cols || 6);
   const order = ['progress', 'pending', 'todo'];
-  items.slice().sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind)).slice(0, 48).forEach((it) => { const d = wEl('i', 'dotLit'); d.style.background = DOT_COLOR[it.kind]; d.title = it.kind + (it.crit ? ', critical' : ''); if (it.crit) d.classList.add('crit'); g.append(d) });
+  items.slice().sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind)).slice(0, 96).forEach((it) => { const d = wEl('i', 'dotLit'); d.style.background = DOT_COLOR[it.kind]; d.title = it.kind + (it.crit ? ', critical' : ''); if (it.crit) d.classList.add('crit'); g.append(d) });
   const n = Math.max(0, Math.ceil(items.length / (cols || 6)) * (cols || 6) - items.length); for (let i = 0; i < n; i++) g.append(wEl('i', 'dotOff'));
   node.append(g);
   const lg = wEl('div', 'dotLegend'); for (const [k, t] of [['progress', 'progressing'], ['pending', 'pending'], ['todo', 'not started']]) { const s = wEl('span'); const dt = wEl('i', 'dotLit sm'); dt.style.background = DOT_COLOR[k]; s.append(dt, document.createTextNode(' ' + t)); lg.append(s) } { const s = wEl('span'); s.append(wEl('i', 'dotLit sm crit'), document.createTextNode(' ring = critical')); lg.append(s) }
