@@ -2,6 +2,8 @@
 // Composes the LinkedIn post-2 mockups from two live screenshots (/tmp/desk.png, /tmp/phone.png): a portrait hero and the 1200x627 link-preview card.
 const fs = require('fs'), path = require('path'), os = require('os');
 const pw = require(path.join(os.homedir(), 'dev/salesday-rel1359/node_modules/playwright'));
+const QR = require(path.join(os.homedir(), 'dev/salesday-rel1359/node_modules/qrcode'));
+const LINK = 'https://mission-control-production-f6bba4c5.up.railway.app/?utm_source=linkedin';
 const R = path.join(__dirname, '..'), OUT = path.join(__dirname, 'images');
 const u = (p) => 'file://' + p;
 const fonts = `@font-face{font-family:Quicksand;font-weight:400 700;src:url(${u(R + '/public/fonts/quicksand-latin.woff2')}) format('woff2')}@font-face{font-family:"Codec Pro";font-weight:400;src:url(${u(R + '/public/fonts/codec-pro-regular.woff2')}) format('woff2')}`;
@@ -12,14 +14,16 @@ const phone = (w, src) => `<div style="width:${w}px;background:#111;border-radiu
 const base = `${fonts}*{box-sizing:border-box}html,body{margin:0}body{font-family:Quicksand,"Avenir Next",sans-serif;color:#EAF3EE;background:${bg};overflow:hidden;position:relative}h1{margin:0;font-family:"Codec Pro",Quicksand,sans-serif;font-weight:400;letter-spacing:-.01em;line-height:1.04}.pill{white-space:nowrap;display:inline-block;padding:16px 30px;border-radius:999px;background:#E8E28C;color:#1B2210;font-weight:600;font-size:30px}.live{display:inline-flex;align-items:center;gap:10px;font-size:24px;color:#A8E6D8;font-weight:600;letter-spacing:.12em;text-transform:uppercase}.live i{width:14px;height:14px;border-radius:50%;background:#7FE0B0;box-shadow:0 0 0 6px rgba(127,224,176,.25)}`;
 const load = async (page, html) => { const f = path.join(OUT, '_tmp.html'); fs.writeFileSync(f, '<!doctype html><meta charset="utf-8">' + html); await page.goto('file://' + f); };
 (async () => {
+  const qrSvg = (await QR.toString(LINK, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#0F1B14', light: '#FFFFFF' } })).replace('<svg ', '<svg style="width:100%;height:100%;display:block" ');
+  await QR.toFile(path.join(OUT, 'qr-mission-control-1200.png'), LINK, { width: 1200, margin: 3, errorCorrectionLevel: 'M', color: { dark: '#0F1B14', light: '#FFFFFF' } });
   const b = await pw.chromium.launch();
   const p = await b.newPage({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 2 });
   await load(p, `<style>${base}body{width:1080px;height:1350px;padding:76px 80px}</style>
   <img src="${wm}" style="height:44px;display:block"><div class="live" style="margin-top:46px"><i></i>Live right now</div>
   <h1 style="font-size:92px;margin-top:20px">Watch an AI team build a product. Live.</h1>
-  <div style="position:absolute;left:60px;top:470px">${laptop(860, u('/tmp/desk.png'))}</div>
-  <div style="position:absolute;right:56px;top:600px">${phone(290, u('/tmp/phone.png'))}</div>
-  <div style="position:absolute;left:80px;bottom:76px;right:80px;display:flex;justify-content:space-between;align-items:center"><span class="pill">Open the live page</span><span style="font-size:22px;white-space:nowrap;color:#A9BDB2;font-weight:500">mission-control-production-f6bba4c5.up.railway.app</span></div>`);
+  <div style="position:absolute;left:60px;top:430px">${laptop(860, u('/tmp/desk.png'))}</div>
+  <div style="position:absolute;right:56px;top:520px">${phone(250, u('/tmp/phone.png'))}</div>
+  <div style="position:absolute;left:80px;bottom:70px;right:80px;display:flex;align-items:center;gap:34px"><div style="width:220px;height:220px;flex:none;background:#fff;border-radius:28px;padding:16px;box-shadow:0 20px 40px rgba(0,0,0,.45)">${qrSvg}</div><div><div style="font-family:'Codec Pro',Quicksand,sans-serif;font-size:50px;line-height:1.05">Scan to open it live</div><div style="margin-top:12px;font-size:21px;line-height:1.35;color:#A9BDB2;font-weight:500">mission-control-production-<br>f6bba4c5.up.railway.app</div></div></div></div>`);
   await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(500);
   await p.screenshot({ path: path.join(OUT, 'post2-hero-1080x1350.jpg'), type: 'jpeg', quality: 93 });
   const q = await b.newPage({ viewport: { width: 1200, height: 627 }, deviceScaleFactor: 2 });
