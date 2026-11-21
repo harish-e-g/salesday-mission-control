@@ -136,4 +136,4 @@ MIT for the code. See `LICENSE`. The fonts above and the SalesDay wordmark keep 
 
 ## Partner logo (optional)
 
-Set `"partner": { "enabled": true }` in `mission.config.json` to show a small "In partnership with" mark in the header (`public/brand/partner-logo.png`). It is off in the example config. Set it to `false` to remove it everywhere.
+Set `"partner": { "enabled": true }` in `mission.config.json` to show a small partner logo in the header (`public/brand/partner-logo.png`). It is off in the example config. Set it to `false` to remove it everywhere.
