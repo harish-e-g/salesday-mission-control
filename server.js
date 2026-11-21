@@ -133,7 +133,7 @@ function state() {
     totals: { rows: rows.length, open: open.length, done: cnt((r) => r.st === 'C') },
     status: { I: cnt((r) => r.st === 'I'), P: cnt((r) => r.st === 'P'), B: cnt((r) => r.st === 'B'), N: cnt((r) => r.st === 'N'), C: cnt((r) => r.st === 'C') },
     courts: { ai: { I: S('ai', 'I'), P: S('ai', 'P'), B: S('ai', 'B'), N: S('ai', 'N') }, you: { I: S('you', 'I'), P: S('you', 'P'), B: S('you', 'B'), N: S('you', 'N') } },
-    critical: open.filter((r) => r.pri === 'critical').sort(byUrgency).slice(0, 8), high: cnt((r) => r.st !== 'C' && r.pri === 'high'), criticalCount: cnt((r) => r.st !== 'C' && r.pri === 'critical'),
+    critical: open.filter((r) => r.pri === 'critical').sort(byUrgency).slice(0, 8), high: cnt((r) => r.st !== 'C' && r.pri === 'high'), criticalCount: cnt((r) => r.st !== 'C' && r.pri === 'critical'), openDots: open.map((r) => ({ st: r.st, crit: r.pri === 'critical' })),
     todoAi: by('ai').slice(0, 9), todoYou: by('you').slice(0, 9),
     progressing: open.filter((r) => r.st === 'I').sort(byUrgency).slice(0, 8), queue: open.filter((r) => r.st === 'N' || r.st === 'P').sort(byUrgency).slice(0, 8),
     neverTouched: open.filter((r) => r.st === 'N').sort(byUrgency).slice(0, 8), neverTouchedCount: cnt((r) => r.st === 'N'),
@@ -150,6 +150,9 @@ const server = http.createServer((q, s) => {
   if (q.url.startsWith('/api/live?history')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify({ history: liveHistory })); }
   if (q.url.startsWith('/api/live')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify(liveSample())); }
   if (q.url.startsWith('/api/state')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify(state())); }
+  const url = q.url.split('?')[0], TYPES = { '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.html': 'text/html; charset=utf-8', '.json': 'application/json' };
+  const asset = url === '/demo-state.json' ? path.join(HERE, 'docs', 'demo-state.json') : /^\/(theme\.js|widgets\.js|widgets\.css|themes\.html|brand\/[\w.-]+\.svg)$/.test(url) ? path.join(HERE, 'public', url.slice(1)) : null;
+  if (asset && fs.existsSync(asset)) { s.setHeader('content-type', TYPES[path.extname(asset)] || 'application/octet-stream'); s.setHeader('cache-control', 'no-store'); return s.end(fs.readFileSync(asset)); }
   s.setHeader('content-type', 'text/html; charset=utf-8'); s.setHeader('cache-control', 'no-store'); s.end(PAGE());
 });
 if (require.main === module) server.listen(PORT, '127.0.0.1', () => { sampleLoop(); setInterval(sampleLoop, 2000); console.log(`Mission Control on http://127.0.0.1:${PORT} (${DEMO || !fs.existsSync(cfgPath) ? 'demo data' : 'your data'})`); });
