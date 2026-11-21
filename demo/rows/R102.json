@@ -1,0 +1,9 @@
+{
+  "id": "R102",
+  "ball": "AI",
+  "pri": "critical",
+  "status": "I",
+  "req": "Totals and their parts must add up to the rupee",
+  "fin": "One money formatter written, tests in progress",
+  "est": "1 day"
+}

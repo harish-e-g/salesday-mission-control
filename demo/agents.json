@@ -1,0 +1,5 @@
+{
+  "running": 5,
+  "peers": 2,
+  "note": "Sample data. Five sub-agents are building in parallel; two cloud sessions are idle."
+}

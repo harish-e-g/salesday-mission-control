@@ -1,0 +1,9 @@
+{
+  "id": "R101",
+  "ball": "AI",
+  "pri": "critical",
+  "status": "I",
+  "req": "Charts must open the exact deals behind every bar",
+  "fin": "Drill-down links built for 6 of 9 charts",
+  "est": "10 min"
+}

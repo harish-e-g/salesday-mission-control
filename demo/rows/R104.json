@@ -1,0 +1,9 @@
+{
+  "id": "R104",
+  "ball": "AI",
+  "pri": "critical",
+  "status": "P",
+  "req": "Notices must open the exact card, even when signed out",
+  "fin": "Live, waiting for your check in the mail client",
+  "est": "10 min"
+}

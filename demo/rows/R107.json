@@ -1,0 +1,9 @@
+{
+  "id": "R107",
+  "ball": "AI",
+  "pri": "high",
+  "status": "N",
+  "req": "Resume the sequencing power lane",
+  "fin": "Queued after the current release",
+  "est": "10 min"
+}

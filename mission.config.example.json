@@ -1,0 +1,106 @@
+{
+  "project": "SalesDay",
+  "owner": "",
+  "ballLabels": {
+    "ai": "Claude",
+    "you": "You"
+  },
+  "rowsDir": "./demo/rows",
+  "agentsFile": "./demo/agents.json",
+  "liveUrl": null,
+  "staticGate": {
+    "state": "running",
+    "label": "2.4.0",
+    "startedMinutesAgo": 21,
+    "averageMinutes": 35
+  },
+  "staticLanes": [
+    {
+      "name": "Notifications",
+      "commits": 6,
+      "editing": 3,
+      "last": "12 minutes ago",
+      "recent": [
+        "Digest follows per-event choices"
+      ]
+    },
+    {
+      "name": "Phone layout",
+      "commits": 4,
+      "editing": 0,
+      "last": "40 minutes ago",
+      "recent": [
+        "Bottom bar with five destinations"
+      ]
+    },
+    {
+      "name": "Dashboards",
+      "commits": 2,
+      "editing": 11,
+      "last": "5 minutes ago",
+      "recent": [
+        "Every chart bar opens its list"
+      ]
+    },
+    {
+      "name": "Regression harness",
+      "commits": 0,
+      "editing": 7,
+      "last": "",
+      "recent": []
+    }
+  ],
+  "staticReleases": [
+    {
+      "v": "2.3.1",
+      "date": "TODAY-0",
+      "items": [
+        "Totals add up",
+        "Charts open their lists"
+      ]
+    },
+    {
+      "v": "2.3.0",
+      "date": "TODAY-1",
+      "items": [
+        "Phone bottom bar",
+        "Saved views"
+      ]
+    },
+    {
+      "v": "2.2.2",
+      "date": "TODAY-2",
+      "items": [
+        "Notice links fixed"
+      ]
+    },
+    {
+      "v": "2.2.1",
+      "date": "TODAY-4",
+      "items": [
+        "Bulk actions with undo"
+      ]
+    },
+    {
+      "v": "2.2.0",
+      "date": "TODAY-6",
+      "items": [
+        "Wide-screen layout"
+      ]
+    }
+  ],
+  "staticMachine": {
+    "cores": 10,
+    "load1": 2.4,
+    "load5": 2.1,
+    "memTotal": 17179869184,
+    "memUsed": 10200000000,
+    "swapTotal": 2048,
+    "swapUsed": 412,
+    "swapFree": 1636,
+    "diskTotal": 994662584320,
+    "diskFree": 482000000000,
+    "level": "ok",
+    "uptimeH": 19
+  }
+}

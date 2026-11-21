@@ -1,0 +1,6 @@
+node_modules/
+mission.config.json
+*.log
+.DS_Store
+/rows/
+/agents.json
