@@ -75,7 +75,9 @@ footer{color:var(--ink3);font-size:12px;text-align:center}
 <script>
 const $=(i)=>document.getElementById(i);
 const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e};
-const fill=(id,...nodes)=>{const n=$(id);n.replaceChildren(...nodes.flat().filter(Boolean))};
+const sigOf=(nodes)=>nodes.map((n)=>n.outerHTML||n.textContent).join('\u0001');
+const put=(n,nodes)=>{const g=sigOf(nodes);if(n.__sig===g)return;n.__sig=g;n.replaceChildren(...nodes)};
+const fill=(id,...nodes)=>put($(id),nodes.flat().filter(Boolean));
 const C={},PAL={};let themeKey='porcelain',plotSel=null,moodRange='Week';
 function refreshPal(){const r=document.documentElement;for(const k of ['a1','a2','a3','a4','a5','ink2','ink3','track'])PAL[k]=themeColor(r,k);Object.assign(C,{mint:PAL.a1,butter:PAL.a2,lav:PAL.a3,coral:PAL.a4,rose:PAL.a5})}
 function setTheme(k){themeKey=THEMES[k]?k:'porcelain';try{localStorage.setItem('mc-theme',themeKey)}catch(e){}const t=applyTheme(themeKey);refreshPal();$('logo').src=t.mode==='dark'?'brand/salesday-wordmark-reversed.svg':'brand/salesday-wordmark-primary.svg';$('themes').replaceChildren(...Object.keys(THEMES).map((k2)=>{const b=el('button');b.type='button';b.title=THEMES[k2].name;b.setAttribute('aria-label',THEMES[k2].name);b.setAttribute('aria-pressed',k2===themeKey);for(const c of ['a1','a2','a3','a4']){const i=el('i');i.style.background=THEMES[k2][c];b.append(i)}b.onclick=()=>setTheme(k2);return b}));if(last)render(last)}
@@ -89,11 +91,10 @@ function render(s){
   last=s;const L=s.labels;
   $('hi').textContent=s.owner?('Hello, '+s.owner):'Hello';document.title=s.project+' Mission Control';
   const pills=[];const mk=(t,c)=>{const p=el('span','pill '+(c||''));const d=el('span','dot');d.style.background=c==='ok'?'#7FE0B0':c==='watch'?'#F2D27A':c==='critical'?'#F29A8A':'#A8E6D8';p.append(d,document.createTextNode(t));return p};
-  if(s.liveVersion)pills.push(mk('Live '+s.liveVersion,'ok'));pills.push(mk(s.machine.level==='ok'?'Machine healthy':s.machine.level==='watch'?'Machine busy':'Memory critical',s.machine.level));if(s.stale)pills.push(mk('Publisher offline, last update '+hhmm(s.publishedAt||s.at),'watch'));pills.push(mk(s.agents.running+(s.agents.running===1?' agent running':' agents running')));$('pills').replaceChildren(...pills);
+  if(s.liveVersion)pills.push(mk('Live '+s.liveVersion,'ok'));pills.push(mk(s.machine.level==='ok'?'Machine healthy':s.machine.level==='watch'?'Machine busy':'Memory critical',s.machine.level));if(s.stale)pills.push(mk('Publisher offline, last update '+hhmm(s.publishedAt||s.at),'watch'));pills.push(mk(s.agents.running+(s.agents.running===1?' agent running':' agents running')));put($('pills'),pills);
   $('upd').textContent='updated '+hhmm(s.at);
   const o=s.totals.open||1,S=s.status;
-  $('ring').replaceChildren(ring([{v:s.totals.done/(s.totals.rows||1),color:C.mint},{v:S.I/o,color:C.butter},{v:(S.P+S.B)/o,color:C.lav},{v:S.N/o,color:C.coral}]));
-  const mid=el('div','mid');mid.append(el('b',null,String(s.totals.open)),el('span',null,'open items'));$('ring').append(mid);
+  {const mid=el('div','mid');mid.append(el('b',null,String(s.totals.open)),el('span',null,'open items'));put($('ring'),[ring([{v:s.totals.done/(s.totals.rows||1),color:C.mint},{v:S.I/o,color:C.butter},{v:(S.P+S.B)/o,color:C.lav},{v:S.N/o,color:C.coral}]),mid])}
   fill('kpi',...[['Done',S.C,C.mint],['In progress',S.I,C.butter],['Pending',S.P,C.lav],['Not started',S.N,C.coral]].map(([n,v,c])=>{const d=el('div');d.append(el('b',null,String(v)));const sp=el('span');const dt=el('span','dot');dt.style.background=c;sp.append(dt,document.createTextNode(' '+n));d.append(sp);return d}));
   fill('legend',...[[`${S.I} progressing now`,C.butter],[`${S.P} pending a check, ${S.B} blocked`,C.lav],[`${s.neverTouchedCount} never touched`,C.coral],[`${s.criticalCount} critical, ${s.high} high priority`,C.rose]].map(([t,c])=>{const d=el('div');const dt=el('span','dot');dt.style.background=c;d.append(dt,el('span',null,t));return d}));
   const ai=s.courts.ai,yo=s.courts.you,sum=(c)=>c.I+c.P+c.B+c.N,tot=(sum(ai)+sum(yo))||1;
@@ -109,7 +110,7 @@ function render(s){
     const d2=mkBox(w,'Agentic AI sessions working','Autonomous sessions on their own tasks right now'+(id?', '+id+' idle':''),w,'b');for(let i=0;i<Math.min(id,12);i++){const x=el('i','idle');d2.querySelector('.crewDots').append(x)}
     fill('crew',mkBox(g.running,'AI agents working','Sub-agents building in parallel for the lead session',g.running,''),d2)}
   const a=s.agents;const ad=el('div');const ak=el('div','kpi');for(const [n,v] of [['sub-agents running',a.running],['peer sessions',a.peers]]){const d=el('div');d.append(el('b',null,String(v)),el('span',null,n));ak.append(d)}ad.append(ak,el('div','small',a.note||''));fill('agents',ad);
-  const tabs=$('tabs');tabs.replaceChildren(...[['all','Both'],['ai',L.ai],['you','You']].map(([k,t])=>{const b=el('button',null,t);b.type='button';b.setAttribute('aria-pressed',who===k);b.onclick=()=>{who=k;render(last)};return b}));
+  const tabs=$('tabs');put(tabs,[['all','Both'],['ai',L.ai],['you','You']].map(([k,t])=>{const b=el('button',null,t);b.type='button';b.setAttribute('aria-pressed',who===k);b.onclick=()=>{who=k;render(last)};return b}));
   fill('todo',...(who==='ai'?list(s.todoAi):who==='you'?list(s.todoYou):[el('div','small',L.ai+"'s list"),...list(s.todoAi.slice(0,5)),el('div','small','Your list'),...list(s.todoYou.slice(0,5))]));
   $('critSub').textContent=s.criticalCount+' critical, '+s.high+' high';fill('crit',...list(s.critical));
   fill('prog',...list(s.progressing));fill('queue',...list(s.queue));$('ntSub').textContent=s.neverTouchedCount+' rows';fill('nt',...list(s.neverTouched));
@@ -143,12 +144,13 @@ function areaBars(c,vals,labels){const {x,w,h}=sizeCanvas(c);x.clearRect(0,0,w,h
   const pts=vals.map((v,i)=>({x:L+pw*(i/(vals.length-1)),y:T+ph*(1-v/mx)}));x.beginPath();pts.forEach((p,i)=>{if(i===0)x.moveTo(p.x,p.y);else{const q=pts[i-1],mx2=(q.x+p.x)/2;x.bezierCurveTo(mx2,q.y,mx2,p.y,p.x,p.y)}});const line=new Path2D();x.stroke(line);const g=x.createLinearGradient(0,T,0,T+ph);g.addColorStop(0,PAL.a3+'8c');g.addColorStop(1,PAL.a3+'00');x.save();x.shadowColor=PAL.a3;x.shadowBlur=10;x.strokeStyle=PAL.a3;x.lineWidth=2.4;x.lineJoin='round';x.stroke();x.restore();x.lineTo(pts[pts.length-1].x,T+ph);x.lineTo(pts[0].x,T+ph);x.closePath();x.fillStyle=g;x.fill();
   x.fillStyle=PAL.ink3;x.textAlign='center';labels.forEach((l,i)=>{if(i%4===0)x.fillText(l,pts[i].x,h-8)})}
 let hoursData=null;
-function frame(){lineChart($('pulse'),[{pts:hist.cpu,color:PAL.a1},{pts:hist.mem,color:PAL.a2},{pts:hist.swap,color:PAL.a3}]);lineChart($('spark'),[{pts:hist.open,color:PAL.a4},{pts:hist.prog,color:PAL.a1}],{fixedMax:false,unit:''});if(hoursData)areaBars($('hours'),hoursData.map((h)=>h.n),hoursData.map((h)=>String(h.h).padStart(2,'0')+':00'));requestAnimationFrame(frame)}
+let lastFrame=0,hoursSig='';
+function frame(ts){requestAnimationFrame(frame);if(ts-lastFrame<33)return;lastFrame=ts;lineChart($('pulse'),[{pts:hist.cpu,color:PAL.a1},{pts:hist.mem,color:PAL.a2},{pts:hist.swap,color:PAL.a3}]);lineChart($('spark'),[{pts:hist.open,color:PAL.a4},{pts:hist.prog,color:PAL.a1}],{fixedMax:false,unit:''});if(hoursData){const hc=$('hours'),g=JSON.stringify(hoursData)+hc.clientWidth+'x'+hc.clientHeight+themeKey;if(g!==hoursSig){hoursSig=g;areaBars(hc,hoursData.map((h)=>h.n),hoursData.map((h)=>String(h.h).padStart(2,'0')+':00'))}}}
 function pushLive(l,quiet){const t=l.at,m=l.machine;hist.cpu.push({t,v:Math.min(100,m.load1/m.cores*100)});hist.mem.push({t,v:m.memUsed/m.memTotal*100});hist.swap.push({t,v:m.swapTotal?m.swapUsed/m.swapTotal*100:0});hist.open.push({t,v:l.open});hist.prog.push({t,v:l.progressing});for(const k of Object.keys(hist)){while(hist[k].length&&hist[k][0].t<t-WIN-15000)hist[k].shift()}
   if(quiet)return;
-  const lg=(id,items)=>{const n=$(id);n.replaceChildren(...items.map(([c,t,v])=>{const d=el('span');const dt=el('span','dot');dt.style.background=c;d.append(dt,document.createTextNode(' '+t),el('b',null,v));return d}))};
+  const lg=(id,items)=>{const n=$(id);put(n,items.map(([c,t,v])=>{const d=el('span');const dt=el('span','dot');dt.style.background=c;d.append(dt,document.createTextNode(' '+t),el('b',null,v));return d}))};
   lg('pulseLegend',[[PAL.a1,'CPU load',Math.round(hist.cpu.at(-1).v)+'%'],[PAL.a2,'Memory',Math.round(hist.mem.at(-1).v)+'%'],[PAL.a3,'Swap',Math.round(hist.swap.at(-1).v)+'%']]);lg('sparkLegend',[[PAL.a4,'Open',String(l.open)],[PAL.a1,'Progressing',String(l.progressing)],[PAL.ink3,'Done',String(l.done)]]);
-  const sub=$('pulseSub');sub.replaceChildren(el('span','live'),document.createTextNode((demoMode?'simulated live, ':'live, ')+'last 3 minutes'))}
+  const sub=$('pulseSub');if(!sub.firstChild||!sub.firstChild.classList||!sub.firstChild.classList.contains('live')){sub.replaceChildren(el('span','live'),document.createTextNode(''))}sub.lastChild.nodeValue=(demoMode?'simulated live, ':'live, ')+'last 3 minutes'}
 async function tick(){try{const s=await getState();hoursData=s.hours||null;render(s);if(demoMode)$('upd').textContent='demo data, simulated live'}catch(e){$('upd').textContent=e.message==='waiting'?'waiting for the first live update':'offline'}}
 async function backfill(){try{if(!demoMode){const r=await fetch('api/live?history=1',{cache:'no-store'});if(r.ok){const j=await r.json();(j.history||[]).forEach((l)=>pushLive(l,true));return}demoMode=true}const base=demoBase||await (await fetch('demo-state.json')).json();demoBase=base;const now=Date.now();for(let i=88;i>=1;i--){const m=demoMachine(base.machine);pushLive({at:now-i*2000,machine:m,open:base.totals.open+Math.round(Math.sin((now-i*2000)/20000)*1.2),done:base.totals.done,progressing:base.status.I+(Math.sin((now-i*2000)/14000)>.4?1:0)},true)}}catch(e){}}
 async function liveTick(){try{pushLive(await getLive())}catch(e){}}

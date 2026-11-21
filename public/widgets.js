@@ -40,6 +40,7 @@ function moodOf(v, max, min) { const r = ratio(v, max, min || 0); return r >= .7
 /* 1. dot matrix: one dot per open item, lit by status. items = [{kind: 'critical'|'progress'|'pending'|'todo'}] */
 const DOT_COLOR = { critical: 'var(--a5)', progress: 'var(--a2)', pending: 'var(--a3)', todo: 'var(--a4)' };
 function dotMatrix(node, { title, value, total, items, cols }) {
+  { const k = JSON.stringify(arguments[1]); if (node.__k === k) return; node.__k = k; }
   node.replaceChildren();
   const head = wEl('div', 'wHead'); head.append(wEl('span', 'wIcon', '◈'), wEl('span', null, title)); node.append(head);
   const big = wEl('div', 'wBig'); big.append(document.createTextNode(String(value)), wEl('small', null, '/' + total)); node.append(big);
@@ -54,6 +55,7 @@ function dotMatrix(node, { title, value, total, items, cols }) {
 
 /* 2. week strip: calendar week Sun..Sat with a face per day that has happened. days = [{label, date, v|null, today}] */
 function dayStrip(node, { days, max, min }) {
+  { const k = JSON.stringify(arguments[1]); if (node.__k === k) return; node.__k = k; }
   node.replaceChildren(); const row = wEl('div', 'dayStrip');
   days.forEach((d) => {
     const c = wEl('div', 'dayCell' + (d.today ? ' today' : '')); c.append(wEl('span', 'dl', d.label), wEl('b', null, String(d.date)));
@@ -64,6 +66,7 @@ function dayStrip(node, { days, max, min }) {
 
 /* 3. dot plot with a selectable column, like a health overview. points = [{label, v}] */
 function dotPlot(node, { title, unit, points, sel, onPick }) {
+  { const k = JSON.stringify(arguments[1]); if (node.__k === k) return; node.__k = k; }
   node.replaceChildren(); let cur = sel == null ? points.length - 1 : sel; const mx = Math.max(1, ...points.map((p) => p.v));
   const head = wEl('div', 'wHead'); head.append(wEl('span', 'wIcon', '⌕'), wEl('span', null, title)); node.append(head);
   const big = wEl('div', 'wBig'); const num = document.createTextNode(''); const un = wEl('small', null, ' ' + unit); big.append(num, un); node.append(big);
@@ -79,6 +82,7 @@ function dotPlot(node, { title, unit, points, sel, onPick }) {
 
 /* 4. mood tracker: a face per period on a dashed line, height = how busy it was. ranges = {Week: [...], '24 h': [...]}, each [{label, v}] */
 function moodTracker(node, { ranges, start, onRange }) {
+  { const k = JSON.stringify(arguments[1]); if (node.__k === k) return; node.__k = k; }
   node.replaceChildren(); const keys = Object.keys(ranges); let cur = start || keys[0];
   const head = wEl('div', 'wHead split'); head.append(wEl('span', null, 'Mood tracker'));
   const sel = wEl('div', 'seg'); keys.forEach((k) => { const b = wEl('button', null, k); b.type = 'button'; b.onclick = () => { cur = k; if (onRange) onRange(k); draw() }; sel.append(b) }); head.append(sel); node.append(head);
