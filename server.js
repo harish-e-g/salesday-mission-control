@@ -162,8 +162,8 @@ const server = http.createServer((q, s) => {
   if (q.url.startsWith('/api/live?history')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify({ history: liveHistory })); }
   if (q.url.startsWith('/api/live')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify(liveSample())); }
   if (q.url.startsWith('/api/state')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify(state())); }
-  const url = q.url.split('?')[0], TYPES = { '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.html': 'text/html; charset=utf-8', '.json': 'application/json', '.woff2': 'font/woff2' };
-  const asset = url === '/demo-state.json' ? path.join(HERE, 'docs', 'demo-state.json') : /^\/(theme\.js|widgets\.js|widgets\.css|themes\.html|brand\/[\w.-]+\.svg|fonts\/[\w.-]+\.woff2)$/.test(url) ? path.join(HERE, 'public', url.slice(1)) : null;
+  const url = q.url.split('?')[0], TYPES = { '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.html': 'text/html; charset=utf-8', '.json': 'application/json', '.woff2': 'font/woff2', '.jpg': 'image/jpeg' };
+  const asset = url === '/demo-state.json' ? path.join(HERE, 'docs', 'demo-state.json') : /^\/(theme\.js|widgets\.js|widgets\.css|themes\.html|brand\/[\w.-]+\.svg|fonts\/[\w.-]+\.woff2|og-image\.jpg)$/.test(url) ? path.join(HERE, 'public', url.slice(1)) : null;
   if (asset && fs.existsSync(asset)) { s.setHeader('content-type', TYPES[path.extname(asset)] || 'application/octet-stream'); s.setHeader('cache-control', 'no-store'); return s.end(fs.readFileSync(asset)); }
   s.setHeader('content-type', 'text/html; charset=utf-8'); s.setHeader('cache-control', 'no-store'); s.end(PAGE());
 });
