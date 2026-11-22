@@ -53,7 +53,7 @@ footer{color:var(--ink3);font-size:12px;text-align:center}
   <section class="card c12 crew" aria-label="Agents working now" id="crew"></section>
   <section class="card tint c8" aria-label="Progress"><h2>Where we are <span class="sub" id="upd"></span></h2><div class="hero"><div class="ring" id="ring"></div><div><div class="kpi" id="kpi"></div><div class="legend" id="legend" style="margin-top:14px"></div></div></div></section>
   <section class="card" aria-label="Whose court"><h2>Whose court is the ball in</h2><div id="courts"></div></section>
-  <section class="card" aria-label="Release"><h2>Release and tentative finish</h2><div id="gate"></div></section>
+  <section class="card" aria-label="Release"><h2>App version and release</h2><div id="gate"></div></section>
   <section class="card" aria-label="Machine"><h2>Load and memory <span class="sub" id="mlevel"></span></h2><div id="machine"></div></section>
   <section class="card" aria-label="Agents"><h2>Agents</h2><div id="agents"></div></section>
   <section class="card" aria-label="Delivery score" id="wDots"></section>
@@ -105,6 +105,7 @@ function render(s){
   const cd=el('div');const k=el('div','kpi');for(const [n,c,col] of [[L.ai+"'s court",ai,C.mint],['Your court',yo,C.lav]]){const d=el('div');d.append(el('b',null,String(sum(c))));const sp=el('span');const dt=el('span','dot');dt.style.background=col;sp.append(dt,document.createTextNode(' '+n));d.append(sp,el('div','small',`${c.I} progressing, ${c.P} pending, ${c.B} blocked, ${c.N} not started`));k.append(d)}
   const bar=el('div','bar');bar.style.marginTop='14px';for(const [v,col] of [[sum(ai),C.mint],[sum(yo),C.lav]]){const i=el('i');i.style.width=(v/tot*100)+'%';i.style.background=col;bar.append(i)}cd.append(k,bar);fill('courts',cd);
   const g=s.gate;const gd=el('div');
+  {const v=s.versions||{};const vb=el('div','verBox');vb.append(el('div','muted','Live now'));vb.append(el('div','eta',v.live?'v'+v.live:'unknown'));vb.append(el('div','small',(v.build?'Build '+v.build+'. ':'')+(v.shipped&&v.shipped.v===v.live?'Shipped '+v.shipped.date+'.':(v.shipped?'Latest changelog entry v'+v.shipped.v+', '+v.shipped.date+'.':'')))) ;vb.append(el('div','small',v.next?'Next: v'+v.next+', '+v.nextState+'.':'Next: nothing waiting in the gate.'));gd.append(vb)}
   if(!g||g.state==='idle')gd.append(el('div','empty','No release is in the gate right now.'));
   else{gd.append(el('div','muted',g.state==='running'?'In the gate since '+hhmm(g.startedAt):g.state==='passed'?'Gate passed':'Gate failed'));const left=Math.max(0,Math.round((g.expectedAt-Date.now())/60000));gd.append(el('div','eta',g.state==='running'?(left>0?'about '+hhmm(g.expectedAt):'any minute now'):(g.state==='passed'?'Pushed':'Needs a fix')));gd.append(el('div','small',g.state==='running'?`${g.elapsedMin} min elapsed of about ${g.averageMinutes}. Release ${g.label}`:`Release ${g.label}`));gd.append(meter('Gate progress',g.elapsedMin,g.averageMinutes,Math.min(100,Math.round(g.elapsedMin/g.averageMinutes*100))+'%'))}
   fill('gate',gd);

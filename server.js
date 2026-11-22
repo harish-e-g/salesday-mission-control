@@ -104,11 +104,11 @@ function machine() {
 }
 
 // ── the live product version (optional) ────────────────────────────────────────────────────────────────────────────────────────────────
-let live = { v: null, at: 0 };
+let live = { v: null, build: null, at: 0 };
 function fetchLive() {
   if (!cfg.liveUrl || Date.now() - live.at < 30000) return; live.at = Date.now();
   const lib = cfg.liveUrl.startsWith('https') ? https : http;
-  const req = lib.get(cfg.liveUrl, { timeout: 4000 }, (res) => { let b = ''; res.on('data', (c) => { b += c; }); res.on('end', () => { try { live.v = JSON.parse(b).version || null; } catch { live.v = null; } }); });
+  const req = lib.get(cfg.liveUrl, { timeout: 4000 }, (res) => { let b = ''; res.on('data', (c) => { b += c; }); res.on('end', () => { try { const j = JSON.parse(b); live.v = j.version || null; live.build = j.build || null; } catch { live.v = null; } }); });
   req.on('error', () => { live.v = null; }); req.on('timeout', () => req.destroy());
 }
 
@@ -148,7 +148,7 @@ function state() {
 // the version people use now and the version being built: the highest package.json version found in the release worktrees ("salesday-rel*") beside the live one
 function versions(gateState) {
   if (cfg.staticVersions) return cfg.staticVersions;
-  const out = { live: live.v || null, next: null, nextState: null };
+  const rel = releases()[0] || null; const out = { live: live.v || null, build: live.build || null, shipped: rel ? { v: rel.v, date: rel.date } : null, next: null, nextState: null };
   const dir = cfg.releaseDir ? path.resolve(HERE, home(cfg.releaseDir)) : null; if (!dir) return out;
   const cmp = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0); } return 0; };
   let best = null;
