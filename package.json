@@ -2,7 +2,7 @@
   "name": "salesday-mission-control",
   "version": "1.0.0",
   "description": "SalesDay Mission Control: a real-time, glass-finished dashboard for building a product with an AI assistant. Progress, whose court the ball is in, agents, priorities, queue, release ETA, and live machine load. Zero dependencies.",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "private": false,
   "scripts": {
     "start": "node server.js",
