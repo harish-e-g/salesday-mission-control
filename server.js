@@ -17,8 +17,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execSync } = require('child_process');
-const { buildTeam } = require('./lib/team');
-const { liveTeam } = require('./lib/live');
+const { buildTeam, buildLiveRoster } = require('./lib/team');
+const { liveTeam, allJobs } = require('./lib/live');
 
 const HERE = __dirname;
 const DEMO = process.argv.includes('--demo');
@@ -130,7 +130,10 @@ function state() {
   const by = (court) => open.filter((r) => r.court === court).sort(byUrgency);
   const day = 24 * 3600 * 1000;
   let agents = readJson(path.resolve(HERE, home(cfg.agentsFile || './demo/agents.json')), { running: 0, peers: 0, note: '' });
-  const TEAM = cfg.teamSource === 'claude-code' ? liveTeam(cfg) : buildTeam(readJson(path.resolve(HERE, home(cfg.teamFile || './demo/team.json')), null), rows);
+  const ROSTER = cfg.teamFile ? readJson(path.resolve(HERE, home(cfg.teamFile)), null) : null;
+  const J = cfg.teamSource === 'claude-code' ? allJobs() : null;
+  const TEAM = cfg.teamSource === 'claude-code' ? (ROSTER ? buildLiveRoster(ROSTER, rows, J.jobs, J.sessionsWorking) : liveTeam(cfg)) : buildTeam(readJson(path.resolve(HERE, home(cfg.teamFile || './demo/team.json')), null), rows);
+  if (TEAM && TEAM.mode === 'roster-live') { const c = TEAM.counts; agents = { running: c.agentsWorking, working: c.sessionsWorking, idle: TEAM.agents.filter((x) => x.status !== 'working').length, peers: c.sessionsWorking, note: 'Live: ' + c.agentsWorking + ' AI agent job(s) running, ' + c.sessionsWorking + ' agentic AI session(s) working, ' + c.jobsToday + ' jobs in the last 24 hours.' }; }
   if (TEAM && TEAM.mode === 'live') { const c = TEAM.counts; agents = { running: c.agentsWorking, working: c.sessionsWorking, idle: TEAM.sessions.filter((x) => x.status !== 'working').length, peers: TEAM.sessions.filter((x) => x.status !== 'working').length, note: 'Live from Claude Code on this machine: ' + TEAM.sessions.length + ' session(s) active in the last 6 hours, ' + c.agentsWorking + ' sub-agent(s) working now.' }; }
   return {
     at: Date.now(), project: cfg.project || 'Project', owner: cfg.owner || '', labels: { ai: AI, you: YOU }, liveVersion: live.v || (DEMO ? '1.0.0' : null),
