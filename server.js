@@ -133,7 +133,7 @@ function state() {
     totals: { rows: rows.length, open: open.length, done: cnt((r) => r.st === 'C') },
     status: { I: cnt((r) => r.st === 'I'), P: cnt((r) => r.st === 'P'), B: cnt((r) => r.st === 'B'), N: cnt((r) => r.st === 'N'), C: cnt((r) => r.st === 'C') },
     courts: { ai: { I: S('ai', 'I'), P: S('ai', 'P'), B: S('ai', 'B'), N: S('ai', 'N') }, you: { I: S('you', 'I'), P: S('you', 'P'), B: S('you', 'B'), N: S('you', 'N') } },
-    critical: open.filter((r) => r.pri === 'critical').sort(byUrgency).slice(0, 8), high: cnt((r) => r.st !== 'C' && r.pri === 'high'), partner: { enabled: !!(cfg.partner && cfg.partner.enabled) }, criticalCount: cnt((r) => r.st !== 'C' && r.pri === 'critical'), openDots: open.map((r) => ({ st: r.st, crit: r.pri === 'critical' })),
+    critical: open.filter((r) => r.pri === 'critical').sort(byUrgency).slice(0, 8), high: cnt((r) => r.st !== 'C' && r.pri === 'high'), partner: { enabled: !!(cfg.partner && cfg.partner.enabled) }, versions: versions((gate() || {}).state), criticalCount: cnt((r) => r.st !== 'C' && r.pri === 'critical'), openDots: open.map((r) => ({ st: r.st, crit: r.pri === 'critical' })),
     todoAi: by('ai').slice(0, 9), todoYou: by('you').slice(0, 9),
     progressing: open.filter((r) => r.st === 'I').sort(byUrgency).slice(0, 8), queue: open.filter((r) => r.st === 'N' || r.st === 'P').sort(byUrgency).slice(0, 8),
     neverTouched: open.filter((r) => r.st === 'N').sort(byUrgency).slice(0, 8), neverTouchedCount: cnt((r) => r.st === 'N'),
@@ -144,6 +144,18 @@ function state() {
   };
 }
 
+
+// the version people use now and the version being built: the highest package.json version found in the release worktrees ("salesday-rel*") beside the live one
+function versions(gateState) {
+  if (cfg.staticVersions) return cfg.staticVersions;
+  const out = { live: live.v || null, next: null, nextState: null };
+  const dir = cfg.releaseDir ? path.resolve(HERE, home(cfg.releaseDir)) : null; if (!dir) return out;
+  const cmp = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0); } return 0; };
+  let best = null;
+  try { for (const n of fs.readdirSync(dir)) { if (!n.startsWith(cfg.releasePrefix || 'salesday-rel')) continue; try { const v = JSON.parse(fs.readFileSync(path.join(dir, n, 'package.json'), 'utf8')).version; if (/^\d+\.\d+\.\d+$/.test(v) && (!best || cmp(v, best) > 0)) best = v; } catch { /* not a release tree */ } } } catch { /* none */ }
+  if (best && (!out.live || cmp(best, out.live) > 0)) { out.next = best; out.nextState = gateState === 'running' ? 'in the gate' : gateState === 'failed' ? 'gate failed, being fixed' : 'being built'; }
+  return out;
+}
 const PAGE = () => fs.readFileSync(path.join(HERE, 'public', 'index.html'), 'utf8');
 const HOSTED = process.env.MC_HOSTED === '1', INGEST_TOKEN = process.env.MC_INGEST_TOKEN || '';
 const hosted = { state: null, stateAt: 0 };

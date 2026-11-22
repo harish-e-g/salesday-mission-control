@@ -95,7 +95,7 @@ function render(s){
   last=s;const L=s.labels;
   $('hi').textContent=s.owner?('Hello, '+s.owner):'Hello';document.title=s.project+' Mission Control';$('partner').hidden=!(s.partner&&s.partner.enabled);
   const pills=[];const mk=(t,c)=>{const p=el('span','pill '+(c||''));const d=el('span','dot');d.style.background=c==='ok'?'#7FE0B0':c==='watch'?'#F2D27A':c==='critical'?'#F29A8A':'#A8E6D8';p.append(d,document.createTextNode(t));return p};
-  if(s.liveVersion)pills.push(mk('Live '+s.liveVersion,'ok'));pills.push(mk(s.machine.level==='ok'?'Machine healthy':s.machine.level==='watch'?'Machine busy':'Memory critical',s.machine.level));if(s.stale)pills.push(mk('Publisher offline, last update '+hhmm(s.publishedAt||s.at),'watch'));pills.push(mk(s.agents.running+(s.agents.running===1?' agent running':' agents running')));put($('pills'),pills);
+  if(s.liveVersion)pills.push(mk('Live '+s.liveVersion,'ok'));if(s.versions&&s.versions.next)pills.push(mk('Next '+s.versions.next+', '+s.versions.nextState,'watch'));pills.push(mk(s.machine.level==='ok'?'Machine healthy':s.machine.level==='watch'?'Machine busy':'Memory critical',s.machine.level));if(s.stale)pills.push(mk('Publisher offline, last update '+hhmm(s.publishedAt||s.at),'watch'));pills.push(mk(s.agents.running+(s.agents.running===1?' agent running':' agents running')));put($('pills'),pills);
   $('upd').textContent='updated '+hhmm(s.at);
   const o=s.totals.open||1,S=s.status;
   {const mid=el('div','mid');mid.append(el('b',null,String(s.totals.open)),el('span',null,'open items'));put($('ring'),[ring([{v:s.totals.done/(s.totals.rows||1),color:C.mint},{v:S.I/o,color:C.butter},{v:(S.P+S.B)/o,color:C.lav},{v:S.N/o,color:C.coral}]),mid])}
