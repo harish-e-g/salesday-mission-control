@@ -17,6 +17,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execSync } = require('child_process');
+const { buildTeam } = require('./lib/team');
+const { liveTeam } = require('./lib/live');
 
 const HERE = __dirname;
 const DEMO = process.argv.includes('--demo');
@@ -127,7 +129,9 @@ function state() {
   const cnt = (f) => rows.filter(f).length; const S = (court, st) => cnt((r) => r.court === court && r.st === st);
   const by = (court) => open.filter((r) => r.court === court).sort(byUrgency);
   const day = 24 * 3600 * 1000;
-  const agents = readJson(path.resolve(HERE, home(cfg.agentsFile || './demo/agents.json')), { running: 0, peers: 0, note: '' });
+  let agents = readJson(path.resolve(HERE, home(cfg.agentsFile || './demo/agents.json')), { running: 0, peers: 0, note: '' });
+  const TEAM = cfg.teamSource === 'claude-code' ? liveTeam(cfg) : buildTeam(readJson(path.resolve(HERE, home(cfg.teamFile || './demo/team.json')), null), rows);
+  if (TEAM && TEAM.mode === 'live') { const c = TEAM.counts; agents = { running: c.agentsWorking, working: c.sessionsWorking, idle: TEAM.sessions.filter((x) => x.status !== 'working').length, peers: TEAM.sessions.filter((x) => x.status !== 'working').length, note: 'Live from Claude Code on this machine: ' + TEAM.sessions.length + ' session(s) active in the last 6 hours, ' + c.agentsWorking + ' sub-agent(s) working now.' }; }
   return {
     at: Date.now(), project: cfg.project || 'Project', owner: cfg.owner || '', labels: { ai: AI, you: YOU }, liveVersion: live.v || (DEMO ? '1.0.0' : null),
     totals: { rows: rows.length, open: open.length, done: cnt((r) => r.st === 'C') },
@@ -140,7 +144,7 @@ function state() {
     recent: rows.filter((r) => Date.now() - r.at < day).sort((a, b) => b.at - a.at).slice(0, 8).map((r) => ({ ...r, ago: Math.round((Date.now() - r.at) / 60000) })),
     hours: Array.from({ length: 24 }, (_, i) => { const to = Date.now() - (23 - i) * 3600000, from = to - 3600000; return { h: new Date(to).getHours(), n: cnt((r) => r.at >= from && r.at < to) }; }),
     week: Array.from({ length: 7 }, (_, i) => { const d0 = new Date(); d0.setHours(0, 0, 0, 0); const from = d0.getTime() - (6 - i) * day; return { d: new Date(from).toLocaleDateString('en', { weekday: 'short' }), n: cnt((r) => r.at >= from && r.at < from + day) }; }),
-    lanes: lanes(), gate: gate(), releases: releases().slice(0, 8), releasesThisWeek: releases().filter((r) => Date.now() - Date.parse(r.date) < 7 * day).length, agents, machine: machine(),
+    team: TEAM, lanes: lanes(), gate: gate(), releases: releases().slice(0, 8), releasesThisWeek: releases().filter((r) => Date.now() - Date.parse(r.date) < 7 * day).length, agents, machine: machine(),
   };
 }
 
@@ -175,7 +179,7 @@ const server = http.createServer((q, s) => {
   if (q.url.startsWith('/api/live')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify(liveSample())); }
   if (q.url.startsWith('/api/state')) { s.setHeader('content-type', 'application/json'); s.setHeader('cache-control', 'no-store'); return s.end(JSON.stringify(state())); }
   const url = q.url.split('?')[0], TYPES = { '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.html': 'text/html; charset=utf-8', '.json': 'application/json', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.png': 'image/png' };
-  const asset = url === '/demo-state.json' ? path.join(HERE, 'docs', 'demo-state.json') : /^\/(theme\.js|widgets\.js|widgets\.css|themes\.html|brand\/[\w.-]+\.(?:svg|png)|fonts\/[\w.-]+\.woff2|og-image\.jpg)$/.test(url) ? path.join(HERE, 'public', url.slice(1)) : null;
+  const asset = url === '/demo-state.json' ? path.join(HERE, 'docs', 'demo-state.json') : /^\/(theme\.js|widgets\.js|widgets\.css|themes\.html|team\.html|layouts\.html|flow\.js|brand\/[\w.-]+\.(?:svg|png)|fonts\/[\w.-]+\.woff2|og-image\.jpg)$/.test(url) ? path.join(HERE, 'public', url.slice(1)) : null;
   if (asset && fs.existsSync(asset)) { s.setHeader('content-type', TYPES[path.extname(asset)] || 'application/octet-stream'); s.setHeader('cache-control', 'no-store'); return s.end(fs.readFileSync(asset)); }
   s.setHeader('content-type', 'text/html; charset=utf-8'); s.setHeader('cache-control', 'no-store'); s.end(PAGE());
 });

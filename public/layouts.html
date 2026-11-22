@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SalesDay Mission Control: Layout options</title>
+<meta name="description" content="Four flowchart layouts for the agent team: org chart, left to right tree, layered pipeline and lane grid.">
+<link rel="stylesheet" href="widgets.css"><link rel="preload" href="fonts/codec-pro-regular.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+:root{--bg0:#E6ECE8;--bg1:#F5F3EE;--glow1:rgba(31,165,140,.16);--glow2:rgba(228,112,58,.08);--ink:#14201B;--ink2:#44564E;--ink3:#6B7C74;--line:rgba(20,32,27,.10);--track:rgba(20,32,27,.08);--card1:rgba(255,255,255,.92);--card2:rgba(255,255,255,.62);--a1:#1FA58C;--a2:#E2B100;--a3:#8A63D2;--a4:#E4703A;--a5:#D9534F;--shadow:rgba(30,50,40,.22);--r:24px}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font:14px/1.45 var(--ui,'Quicksand',system-ui,sans-serif);background:radial-gradient(1100px 600px at 12% -10%,var(--glow1),transparent 60%),radial-gradient(900px 600px at 100% 10%,var(--glow2),transparent 60%),linear-gradient(160deg,var(--bg1),var(--bg0) 60%);background-repeat:no-repeat;padding:20px max(16px,env(safe-area-inset-left,0px)) 48px max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1500px;margin:0 auto;display:grid;gap:16px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.brand h1{margin:0;font-family:var(--num,'Codec Pro',sans-serif);font-weight:400;font-size:clamp(22px,3vw,32px);letter-spacing:-.01em}
+.nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lnk{color:var(--ink2);text-decoration:none;font-weight:600;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--track)}
+.sw{display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:var(--track);border:1px solid var(--line)}.sw button{display:inline-flex;gap:2px;border:1px solid transparent;background:transparent;border-radius:999px;padding:4px 6px;cursor:pointer}.sw button[aria-pressed=true]{border-color:var(--ink3);background:var(--card2)}.sw i{width:9px;height:9px;border-radius:50%;display:block}
+.card{background:linear-gradient(160deg,var(--card1),var(--card2));border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:0 18px 40px -26px var(--shadow);min-width:0}
+h2{margin:0 0 4px;font-size:16px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap}h2 .tag{font-family:var(--num,'Codec Pro',sans-serif);font-size:22px;font-weight:400;background:var(--ink);color:var(--bg1);border-radius:10px;padding:0 10px;line-height:1.4}
+.d{margin:0 0 12px;color:var(--ink2);font-size:13px;max-width:100ch}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--track);color:var(--ink2);border-radius:999px;padding:5px 12px;font:inherit;font-size:12px;font-weight:600;cursor:pointer}.btn[aria-pressed=true]{background:var(--ink);color:var(--bg1);border-color:var(--ink)}
+.pick{margin-left:auto}.pick.on{background:var(--a1);color:#fff;border-color:var(--a1)}
+.view{overflow:auto;border:1px solid var(--line);border-radius:16px;background:var(--card2)}
+.view svg{display:block}
+.note{color:var(--ink3);font-size:12px}
+.off{color:var(--ink3);padding:30px;text-align:center}
+</style></head><body>
+<div class="wrap">
+<header><div class="brand"><img id="logo" src="brand/salesday-wordmark-primary.svg" alt="SalesDay" height="30"><h1>Mission Control · Layout options</h1></div>
+<div class="nav"><a class="lnk" href="team.html">Back to Agent team</a><div class="sw" id="themes" role="group" aria-label="Colour scheme"></div></div></header>
+<section class="card"><p class="d" style="margin:0">Four ways to lay out the live graph as a flowchart. Every agent card has the same size and exactly four single lines: name, designation, department, status with time. Lines run only in the gaps between cards, never over text. Pick one, or say what to change. This page uses your real roster but is a still demo, not the live feed.</p></section>
+<div id="out" class="wrap"></div>
+</div>
+<script src="theme.js"></script>
+<script>
+const NS='http://www.w3.org/2000/svg';const $=(id)=>document.getElementById(id);
+const sv=(t,a,p)=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);if(p)p.append(n);return n};
+const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n};
+const ICONS={compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',shield:'<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',rocket:'<path d="M12 3c3 2 5 5 5 9l-2 3H9l-2-3c0-4 2-7 5-9z"/><circle cx="12" cy="10" r="1.6"/><path d="M10 18l-1 3M14 18l1 3"/>',chart:'<path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/>',mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>',radar:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12l6-6"/>',eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',doc:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',layers:'<path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"/>',phone:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',users:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M15 15c3 0 6 1 6 4"/>',bolt:'<path d="M13 2L5 14h6l-1 8 8-12h-6z"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'};
+const hash=(s)=>{let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0};
+function rng(seed){let s=seed||1;return()=>{s^=s<<13;s^=s>>>17;s^=s<<5;return((s>>>0)%1000)/1000}}
+function faceInto(g,id,shirt,r){const R=rng(hash(id)),skins=['#F1C7A5','#E0A97C','#C98B5D','#9A6440','#6F4429'],hairs=['#2B1B12','#4A2C17','#161616','#8B5A2B','#B9B9B9','#5A2A6B'];
+ const skin=skins[Math.floor(R()*skins.length)],hair=hairs[Math.floor(R()*hairs.length)],style=Math.floor(R()*5),glasses=R()>.5,f=sv('g',{transform:`scale(${r/28})`},g);
+ sv('circle',{r:28,fill:shirt,opacity:.28},f);if(style===2)sv('path',{d:'M-13 -3a13 13 0 0126 0v15q-13 5-26 0z',fill:hair},f);
+ sv('ellipse',{cx:0,cy:25,rx:19,ry:13,fill:shirt},f);sv('rect',{x:-3.5,y:4,width:7,height:7,fill:skin},f);sv('circle',{cx:0,cy:-4,r:11.5,fill:skin},f);
+ if(style===0)sv('path',{d:'M-11.8 -6a11.8 11.8 0 0123.6 0q-11.8-8-23.6 0z',fill:hair},f);
+ if(style===1){sv('path',{d:'M-11.8 -6a11.8 11.8 0 0123.6 0q-11.8-8-23.6 0z',fill:hair},f);sv('circle',{cx:0,cy:-17.5,r:4.2,fill:hair},f)}
+ if(style===2)sv('path',{d:'M-11.8 -5a11.8 11.8 0 0123.6 0q-6-7-12-5-6-2-11.6 5z',fill:hair},f);
+ if(style===3)for(let i=0;i<7;i++){const a=Math.PI+i*Math.PI/6;sv('circle',{cx:Math.cos(a)*10.5,cy:-4+Math.sin(a)*10.5,r:4.4,fill:hair},f)}
+ if(style===4){sv('path',{d:'M-12 -7a12 12 0 0124 0z',fill:shirt},f);sv('rect',{x:-13,y:-8,width:26,height:3,rx:1.5,fill:shirt},f)}
+ sv('circle',{cx:-4.2,cy:-4,r:1.4,fill:'#1d1d1d'},f);sv('circle',{cx:4.2,cy:-4,r:1.4,fill:'#1d1d1d'},f);sv('path',{d:'M-3.6 1.2q3.6 3.2 7.2 0',fill:'none',stroke:'#7a3b2e','stroke-width':1.2,'stroke-linecap':'round'},f);
+ if(glasses){sv('circle',{cx:-4.2,cy:-4,r:3.7,fill:'none',stroke:'#222','stroke-width':1},f);sv('circle',{cx:4.2,cy:-4,r:3.7,fill:'none',stroke:'#222','stroke-width':1},f);sv('path',{d:'M-0.5 -4h1',stroke:'#222','stroke-width':1},f)}}
+let T=THEMES.porcelain,team=null,pickKey='';
+const col=(k)=>T[k]||T.a1;const dark=()=>T.mode==='dark';
+const STAT={working:'a1',waiting:'a2',idle:'ink3',resting:'a3'};const sc=(s)=>s==='idle'?T.ink3:col(STAT[s]);
+const hm=(t)=>new Date(t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+function cd(ms){const m=Math.max(0,Math.round(ms/60000));if(m<1)return '0m';if(m<60)return m+'m';const h=Math.floor(m/60);if(h<24)return h+'h'+(m%60?(m%60)+'m':'');return Math.floor(h/24)+'d'}
+function stat(a,now){if(a.kind==='owner')return a.count?a.count+' waiting on you':'Nothing waiting';if(a.kind==='lead')return 'Working · '+cd(now-(a.since||now));
+ const x=a.a;if(x.status==='working')return 'Working · '+cd(now-(x.since||now));if(x.status==='waiting')return 'Needs you · '+cd(now-(x.since||now));
+ const nx=x.next&&x.next>now?(x.next-now<864e5?' · starts '+hm(x.next):' · starts '+new Date(x.next).toLocaleDateString('en-GB',{weekday:'short'})):'';return (x.status==='idle'?'Idle ':'Resting ')+cd(now-(x.since||now))+nx}
+const fit=(s,n)=>{s=String(s||'');return s.length>n?s.slice(0,n-1)+'…':s};
+const CW=252,CH=92,GX=34,GY=34;
+/* ---------- the card: identical everywhere, four single lines ---------- */
+function drawCard(svg,n,x,y,now){const g=sv('g',{transform:`translate(${x},${y})`},svg),c=n.kind==='owner'?col('a2'):n.kind==='lead'?col('a1'):sc(n.a.status),dc=n.color,amber=n.a&&n.a.needsYou;
+ sv('rect',{width:CW,height:CH,rx:16,fill:dark()?'#10241e':'#ffffff',stroke:amber?col('a2'):dc,'stroke-width':amber?2.6:1.6,opacity:1},g);
+ sv('rect',{x:0,y:16,width:5,height:CH-32,rx:2.5,fill:dc},g);
+ sv('circle',{cx:44,cy:CH/2,r:30,fill:'none',stroke:c,'stroke-width':n.kind==='lead'||(n.a&&n.a.status==='working')?4:2.4},g);
+ const cid='c_'+n.id+'_'+Math.round(x)+'_'+Math.round(y);const cp=sv('clipPath',{id:cid},g);sv('circle',{cx:44,cy:CH/2,r:26},cp);const holder=sv('g',{'clip-path':`url(#${cid})`},g);const inner=sv('g',{transform:`translate(44 ${CH/2})`},holder);faceInto(inner,n.id,dc,26);
+ const lines=[[n.name,15,600,col('ink')||'#14201B',17],[n.role,12,500,T.ink2,25],[n.dept,11,600,dc,26],[stat(n,now),11.5,600,c,26]];let ty=23;for(const [t,fs,fw,fill,m] of lines){const e=sv('text',{x:84,y:ty,'font-size':fs,'font-weight':fw,fill},g);e.textContent=fit(t,m);ty+=18}
+ return {x,y,w:CW,h:CH}}
+const arrow=(svg,x,y,dir,color)=>{const s=7,p=dir==='down'?`${x-s},${y-s*1.4} ${x+s},${y-s*1.4} ${x},${y}`:dir==='right'?`${x-s*1.4},${y-s} ${x-s*1.4},${y+s} ${x},${y}`:dir==='up'?`${x-s},${y+s*1.4} ${x+s},${y+s*1.4} ${x},${y}`:`${x+s*1.4},${y-s} ${x+s*1.4},${y+s} ${x},${y}`;sv('polygon',{points:p,fill:color},svg)};
+function rounded(P,r){P=P.filter((q,i)=>i===0||Math.hypot(q[0]-P[i-1][0],q[1]-P[i-1][1])>.5);if(P.length<3)return `M${P[0][0]} ${P[0][1]}L${P[P.length-1][0]} ${P[P.length-1][1]}`;let d=`M${P[0][0]} ${P[0][1]}`;for(let i=1;i<P.length-1;i++){const a=P[i-1],b=P[i],c=P[i+1],l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]),rr=Math.min(r,l1/2,l2/2);const p1=[b[0]-(b[0]-a[0])/l1*rr,b[1]-(b[1]-a[1])/l1*rr],p2=[b[0]+(c[0]-b[0])/l2*rr,b[1]+(c[1]-b[1])/l2*rr];d+=`L${p1[0]} ${p1[1]}Q${b[0]} ${b[1]} ${p2[0]} ${p2[1]}`}return d+`L${P[P.length-1][0]} ${P[P.length-1][1]}`}
+function edge(svg,P,color,dir,opts){opts=opts||{};const p=sv('path',{d:rounded(P,10),fill:'none',stroke:color,'stroke-width':opts.w||2.2,'stroke-linecap':'round','stroke-linejoin':'round',opacity:opts.o||.9},svg);if(opts.dash)p.setAttribute('stroke-dasharray',opts.dash);const e=P[P.length-1];arrow(svg,e[0],e[1],dir,color);
+ if(opts.flow){const c=sv('circle',{r:3.6,fill:color},svg);let len=0;const seg=[];for(let i=0;i<P.length-1;i++){const l=Math.hypot(P[i+1][0]-P[i][0],P[i+1][1]-P[i][1]);seg.push(l);len+=l}const t0=Math.random();FLOW.push((tm)=>{const u=((tm/3600+t0)%1)*len;let d=u,i=0;while(i<seg.length-1&&d>seg[i]){d-=seg[i];i++}const k=seg[i]?d/seg[i]:0;c.setAttribute('cx',P[i][0]+(P[i+1][0]-P[i][0])*k);c.setAttribute('cy',P[i][1]+(P[i+1][1]-P[i][1])*k)})}}
+let FLOW=[];
+function model(){const groups=team.departments.map((d)=>({d,list:team.agents.filter((a)=>a.dept===d.id)})).filter((g)=>g.list.length);const wait=team.agents.filter((a)=>a.needsYou).length;
+ const mk=(a,d)=>({id:a.id,kind:'agent',name:a.name,role:a.role,dept:d.name,color:col(d.color),a});
+ return {groups:groups.map((g)=>({d:g.d,nodes:g.list.map((a)=>mk(a,g.d))})),owner:{id:'__owner',kind:'owner',name:team.owner.name,role:team.owner.role,dept:'Owner',color:col('a2'),count:wait},lead:team.lead&&{id:'__lead',kind:'lead',name:team.lead.name,role:team.lead.role,dept:'Orchestration',color:col('a1'),since:team.lead.since},wait}}
+function lane(svg,x,y,w,h,color){sv('rect',{x,y,width:w,height:h,rx:22,fill:color,opacity:.07},svg);sv('rect',{x,y,width:w,height:h,rx:22,fill:'none',stroke:color,'stroke-width':1.3,opacity:.4},svg)}
+const flowOn=(n)=>n.a&&n.a.status==='working';
+/* ---------- A: top-down org chart ---------- */
+function layoutA(m,now){const P=34,colW=CW+GX+22,cols=m.groups.length,W=cols*colW+P*2-GX-22+30;let maxN=0;m.groups.forEach((g)=>{maxN=Math.max(maxN,g.nodes.length)});const laneH=(n)=>16+n*CH+(n-1)*GY+16,H=P+CH+GY+CH+80+laneH(maxN)+P+12;
+ const svg=sv('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});const cx=W/2,oy=P,ly=P+CH+GY,bus=ly+CH+34,laneY=bus+26;
+ m.groups.forEach((g,i)=>{lane(svg,P+i*colW-14,laneY,CW+28,laneH(g.nodes.length),g.nodes[0].color)});
+ edge(svg,[[cx,oy+CH],[cx,ly]],col('a2'),'down',{dash:'7 6',o:m.wait?1:.4,flow:m.wait>0});
+ m.groups.forEach((g,i)=>{const x=P+i*colW,hx=x+CW/2;edge(svg,[[cx,ly+CH],[cx,bus],[hx,bus],[hx,laneY+16]],g.nodes[0].color,'down',{flow:g.nodes.some(flowOn)})
+  g.nodes.forEach((n,k)=>{const y=laneY+16+k*(CH+GY);if(k>0)edge(svg,[[hx,y-GY],[hx,y]],n.color,'down',{flow:flowOn(n),w:1.8})})});
+ drawCard(svg,m.owner,cx-CW/2,oy,now);if(m.lead)drawCard(svg,m.lead,cx-CW/2,ly,now);
+ m.groups.forEach((g,i)=>g.nodes.forEach((n,k)=>drawCard(svg,n,P+i*colW,laneY+16+k*(CH+GY),now)));return svg}
+/* ---------- B: left to right tree, one row per department ---------- */
+function layoutB(m,now){const P=34,rows=m.groups.length,pitch=CH+44,H=P*2+rows*pitch,maxN=Math.max(...m.groups.map((g)=>g.nodes.length)),xo=P,xl=xo+CW+GX*2,xh=xl+CW+GX*3;const W=xh+maxN*(CW+GX*2)+P;
+ const svg=sv('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});const mid=P+(rows*pitch-44)/2-CH/2+22,trunk=xl+CW+GX*1.5;
+ m.groups.forEach((g,i)=>{lane(svg,xh-16,P+i*pitch-12,g.nodes.length*(CW+GX*2)-GX*2+32,CH+24,g.nodes[0].color)});
+ edge(svg,[[xo+CW,mid+CH/2],[xl,mid+CH/2]],col('a2'),'right',{dash:'7 6',o:m.wait?1:.4,flow:m.wait>0});
+ m.groups.forEach((g,i)=>{const y=P+i*pitch;edge(svg,[[xl+CW,mid+CH/2],[trunk,mid+CH/2],[trunk,y+CH/2],[xh,y+CH/2]],g.nodes[0].color,'right',{flow:g.nodes.some(flowOn)});
+  g.nodes.forEach((n,k)=>{const x=xh+k*(CW+GX*2);if(k>0)edge(svg,[[x-GX*2,y+CH/2],[x,y+CH/2]],n.color,'right',{flow:flowOn(n),w:1.8})})});
+ drawCard(svg,m.owner,xo,mid,now);if(m.lead)drawCard(svg,m.lead,xl,mid,now);
+ m.groups.forEach((g,i)=>g.nodes.forEach((n,k)=>drawCard(svg,n,xh+k*(CW+GX*2),P+i*pitch,now)));return svg}
+/* ---------- C: layered pipeline, four columns ---------- */
+function layoutC(m,now){const P=34,gap=GX*3+10,xs=[0,1,2,3].map((i)=>P+i*(CW+gap)),W=xs[3]+CW+P,heads=m.groups.map((g)=>g.nodes[0]),specs=[];m.groups.forEach((g,gi)=>g.nodes.slice(1).forEach((n)=>specs.push({n,gi})));const pitch=CH+GY,rows=Math.max(heads.length,specs.length),H=P*2+54+rows*pitch;
+ const svg=sv('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});const top=P+40;[['You',0],['Orchestrator',1],['Department heads',2],['Specialists',3]].forEach(([t,i])=>{const e=sv('text',{x:xs[i],y:P+12,'font-size':12,'font-weight':600,'letter-spacing':'.08em',fill:T.ink3},svg);e.textContent=t.toUpperCase()});
+ const hy=(i)=>top+i*pitch,sy=(i)=>top+i*pitch,my=top+(rows*pitch-GY)/2-CH/2;const bus=xs[1]+CW+gap/2,bus2=xs[2]+CW+gap/2;
+ edge(svg,[[xs[0]+CW,my+CH/2],[xs[1],my+CH/2]],col('a2'),'right',{dash:'7 6',o:m.wait?1:.4,flow:m.wait>0});
+ heads.forEach((h,i)=>edge(svg,[[xs[1]+CW,my+CH/2],[bus,my+CH/2],[bus,hy(i)+CH/2],[xs[2],hy(i)+CH/2]],h.color,'right',{flow:m.groups[i].nodes.some(flowOn)}));
+ specs.forEach((s,i)=>{const h=s.gi;edge(svg,[[xs[2]+CW,hy(h)+CH/2],[bus2,hy(h)+CH/2],[bus2,sy(i)+CH/2],[xs[3],sy(i)+CH/2]],s.n.color,'right',{flow:flowOn(s.n),w:1.8})});
+ drawCard(svg,m.owner,xs[0],my,now);if(m.lead)drawCard(svg,m.lead,xs[1],my,now);heads.forEach((h,i)=>drawCard(svg,h,xs[2],hy(i),now));specs.forEach((s,i)=>drawCard(svg,s.n,xs[3],sy(i),now));return svg}
+/* ---------- D: lane grid, four lanes across and two rows ---------- */
+function layoutD(m,now){const P=34,laneW=CW+36,gap=40,mid=90,cols=4,W=P*2+cols*laneW+2*gap+mid,laneH=(n)=>46+n*CH+(n-1)*GY+18;const r1=m.groups.slice(0,4),r2=m.groups.slice(4,8);const h1=Math.max(...r1.map((g)=>laneH(g.nodes.length))),h2=r2.length?Math.max(...r2.map((g)=>laneH(g.nodes.length))):0;
+ const cx=W/2,oy=P,ly=P+CH+GY,bus1=ly+CH+30,y1=bus1+30,bus2=y1+h1+34,y2=bus2+30,H=y2+h2+P;const svg=sv('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});
+ const lx=(j)=>P+(j<2?j*(laneW+gap):2*laneW+gap+mid+(j-2)*(laneW+gap));
+ edge(svg,[[cx,oy+CH],[cx,ly]],col('a2'),'down',{dash:'7 6',o:m.wait?1:.4,flow:m.wait>0});
+ const drawLane=(g,j,y,h,bus)=>{const x=lx(j),c=g.nodes[0].color;lane(svg,x,y,laneW,h,c);const t=sv('text',{x:x+18,y:y+28,'font-size':13,'font-weight':600,'letter-spacing':'.06em',fill:c},svg);t.textContent=fit(g.d.name.toUpperCase(),26);
+  const hx=x+laneW/2;edge(svg,[[hx,bus],[hx,y]],c,'down',{flow:g.nodes.some(flowOn)});g.nodes.forEach((n,k)=>{const cy=y+46+k*(CH+GY);if(k>0)edge(svg,[[hx,cy-GY],[hx,cy]],n.color,'down',{flow:flowOn(n),w:1.8});drawCard(svg,n,x+18,cy,now)})};
+ /* trunk and buses live in the gutters, above each lane row */
+ const L0=lx(0)+laneW/2,L3=lx(3)+laneW/2,c1=lx(1)+laneW+mid/2+gap/2;sv('path',{d:rounded([[cx,ly+CH],[cx,bus1]],1),stroke:col('a1'),'stroke-width':2.2,fill:'none'},svg);
+ sv('path',{d:`M${L0} ${bus1}H${L3}`,stroke:col('a1'),'stroke-width':2.2,fill:'none',opacity:.9},svg);sv('circle',{cx,cy:bus1,r:4,fill:col('a1')},svg);
+ r1.forEach((g,j)=>drawLane(g,j,y1,h1,bus1));
+ if(r2.length){sv('path',{d:`M${cx} ${bus1}V${bus2}`,stroke:col('a1'),'stroke-width':2.2,fill:'none'},svg);sv('path',{d:`M${lx(0)+laneW/2} ${bus2}H${lx(3)+laneW/2}`,stroke:col('a1'),'stroke-width':2.2,fill:'none'},svg);sv('circle',{cx,cy:bus2,r:4,fill:col('a1')},svg);r2.forEach((g,j)=>drawLane(g,j,y2,h2,bus2))}
+ drawCard(svg,m.owner,cx-CW/2,oy,now);if(m.lead)drawCard(svg,m.lead,cx-CW/2,ly,now);return svg}
+/* ---------- E: layered lanes, the blend of C and D: layers across, titled department lanes down ---------- */
+function layoutE(m,now){const P=34,gap=46,laneH=CH+30+14,pitch=laneH+16,rows=m.groups.length,maxN=Math.max(...m.groups.map((g)=>g.nodes.length)),laneW=18+maxN*CW+(maxN-1)*gap+18,x0=P,laneX=x0+CW+96,W=laneX+laneW+P,top=P+40,H=top+rows*pitch-16+P;
+ const svg=sv('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});const hdr=(t,x)=>{const e=sv('text',{x,y:P+14,'font-size':12,'font-weight':600,'letter-spacing':'.08em',fill:T.ink3},svg);e.textContent=t};
+ hdr('YOU AND ORCHESTRATOR',x0);const hx=laneX+18;hdr('DEPARTMENT HEAD',hx);if(maxN>1)hdr('SPECIALIST',hx+CW+gap);if(maxN>2)hdr('SPECIALIST',hx+2*(CW+gap));
+ const mid=top+(rows*pitch-16)/2,oy=mid-CH-GY/2,ly=mid+GY/2,trunk=x0+CW+48;
+ m.groups.forEach((g,i)=>{const y=top+i*pitch,c=g.nodes[0].color;lane(svg,laneX,y,laneW,laneH,c);const t=sv('text',{x:laneX+18,y:y+22,'font-size':12.5,'font-weight':600,'letter-spacing':'.06em',fill:c},svg);t.textContent=fit(g.d.name.toUpperCase(),32)+'  ·  '+g.nodes.length+(g.nodes.length===1?' agent':' agents')});
+ edge(svg,[[x0+CW/2,oy+CH],[x0+CW/2,ly]],col('a2'),'down',{dash:'7 6',o:m.wait?1:.4,flow:m.wait>0});
+ m.groups.forEach((g,i)=>{const y=top+i*pitch+30,cy=y+CH/2;edge(svg,[[x0+CW,ly+CH/2],[trunk,ly+CH/2],[trunk,cy],[hx,cy]],g.nodes[0].color,'right',{flow:g.nodes.some(flowOn)});
+  g.nodes.forEach((n,k)=>{const x=hx+k*(CW+gap);if(k>0)edge(svg,[[x-gap,cy],[x,cy]],n.color,'right',{flow:flowOn(n),w:1.8});drawCard(svg,n,x,y,now)})});
+ drawCard(svg,m.owner,x0,oy,now);if(m.lead)drawCard(svg,m.lead,x0,ly,now);return svg}
+const LAYS=[['A','Org chart, top down','The classic org chart. The orchestrator at the top feeds a column per department through one bus line. Widest of the four, so it scrolls sideways at full size.',layoutA],['B','Left to right tree','Reads like a flow diagram. You and the orchestrator on the left, one row per department to the right, specialists following their head along the row.',layoutB],['C','Layered pipeline','Four clean layers from left to right: you, orchestrator, department heads, specialists. Every line is a right-angle connector between two neighbouring layers.',layoutC],['E','Layered lanes (blend of C and D)','The layers of C across the top (you and orchestrator, head, specialist) with the titled department lanes of D down the side. Every department has its own connector from the orchestrator, so no line is shared and no line crosses another. Specialists follow their head along the same lane.',layoutE],['D','Lane grid','Eight department lanes in a two by four grid with titles. One trunk down the middle gutter feeds both rows. The most compact of the four.',layoutD]];
+function setTheme(k){const t=THEMES[k]||THEMES.porcelain;T=applyTheme(k in THEMES?k:'porcelain');try{localStorage.setItem('mc-theme',k)}catch(e){}$('logo').src=T.mode==='dark'?'brand/salesday-wordmark-reversed.svg':'brand/salesday-wordmark-primary.svg';
+ $('themes').replaceChildren(...Object.keys(THEMES).map((k2)=>{const b=el('button');b.type='button';b.title=THEMES[k2].name;b.setAttribute('aria-label',THEMES[k2].name);b.setAttribute('aria-pressed',k2===(k in THEMES?k:'porcelain'));for(const c of ['a1','a2','a3','a4']){const i=el('i');i.style.background=THEMES[k2][c];b.append(i)}b.onclick=()=>setTheme(k2);return b}));if(team)render()}
+const fitMode={};
+function render(){FLOW=[];const out=$('out');out.replaceChildren();const m=model(),now=Date.now();
+ for(const [key,name,desc,fn] of LAYS){const sec=el('section','card'),h=el('h2');h.append(Object.assign(el('span','tag',key)),document.createTextNode(name));sec.append(h,el('p','d',desc));
+  const bar=el('div','bar'),fitB=el('button','btn','Fit to width'),actB=el('button','btn','Actual size'),pk=el('button','btn pick'+(pickKey===key?' on':''),pickKey===key?'Your choice':'Choose this layout');for(const b of [fitB,actB,pk])b.type='button';const mode=fitMode[key]||'fit';fitB.setAttribute('aria-pressed',mode==='fit');actB.setAttribute('aria-pressed',mode==='act');
+  fitB.onclick=()=>{fitMode[key]='fit';render()};actB.onclick=()=>{fitMode[key]='act';render()};pk.onclick=()=>{pickKey=key;try{localStorage.setItem('mc-layout',key)}catch(e){}render()};bar.append(fitB,actB,pk);sec.append(bar);
+  const view=el('div','view'),svg=fn(m,now);if(mode==='fit'){svg.style.width='100%';svg.style.height='auto'}view.append(svg);sec.append(view);out.append(sec)}}
+async function load(){try{const r=await fetch('api/state',{cache:'no-store'});const s=await r.json();if(!s.team)throw 0;team=s.team;try{pickKey=localStorage.getItem('mc-layout')||''}catch(e){}render()}catch(e){$('out').replaceChildren(Object.assign(el('div','off'),{textContent:'The roster is not available right now.'}))}}
+{let k='porcelain';try{k=new URLSearchParams(location.search).get('theme')||localStorage.getItem('mc-theme')||'porcelain'}catch(e){}setTheme(k)}
+load();requestAnimationFrame(function f(tm){for(const fn of FLOW)fn(tm);requestAnimationFrame(f)});
+</script></body></html>

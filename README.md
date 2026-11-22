@@ -27,6 +27,22 @@ It is one small Node file and one HTML page. There are no dependencies and no bu
 - **Shipped**: recent releases from your changelog, and a seven-day activity chart
 - **Worked on in the last 24 hours**
 
+## The AI agent team view (free to use)
+
+Open `/team.html` (the "Agent team" button in the header). It is a live map of an **AI team**, not an organisation chart: every card is an AI agent, the orchestrator on top is the **agentic AI** layer that plans, delegates, remembers, verifies and asks a human, and the only human on the map is the owner.
+
+- **AI agent flow:** a layered map (human, agentic AI orchestrator, department heads, specialists). One card size with four single lines: name, designation, department, status with time. Right-angle connectors that never cross text.
+- **Live beats only where work is happening:** a moving dot travels to an agent that is *working*. Agents that are waiting on you (amber), idle (grey) or resting (violet) get no beat, only their own colour.
+- **More views:** shift timeline (when each agent starts or rests), office floor, status board, load map. Five colour themes.
+- **Your own agents:** copy `demo/team.json` to `team.config.json` (git-ignored), set `"teamFile": "./team.config.json"` in `mission.config.json`, and describe your agents. Each agent has `name`, `role`, `dept`, `icon`, `status` (`working`, `waiting`, `idle`, `resting`), `since`, `next` and optional `tags` that link to your rows. Times can be relative (`"-25m"`, `"+2h"`) or ISO.
+- **Layout options:** `/layouts.html` shows five alternative flowchart layouts of the same data.
+
+**Live mode (real data, nothing invented):** set `"teamSource": "claude-code"` in `mission.config.json`. The page then reads this machine's Claude Code activity: each session is an *agentic AI* card, each sub-agent it started is an *AI agent* card. Working = changed in the last two minutes; a session that just finished its turn is *waiting on you*; older ones are idle or resting. Names are friendly labels generated from the session id. Task text is never shown unless you set `"teamShowTasks": true`.
+
+Try the sample in a minute: `node server.js --demo`, then open `http://localhost:4378/team.html`. The names, roles and tasks in `demo/team.json` are made up.
+
+This project is free and open source under the MIT licence. Use it, change it, ship it, and build the same dashboard for your own AI agents.
+
 ## Requirements
 
 Node 18 or newer. Nothing else to install.

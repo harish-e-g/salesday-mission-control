@@ -1,0 +1,224 @@
+{
+ "_note": "Synthetic demo roster. Every name, role and task is made up. Times are relative so the page always looks live. Copy to team.config.json and edit to describe your own agents.",
+ "lead": {
+  "id": "atlas",
+  "name": "Oliver",
+  "role": "Chief Orchestrator",
+  "icon": "compass",
+  "task": "Assigning work to the departments and checking every result",
+  "since": "-3h"
+ },
+ "owner": {
+  "name": "You",
+  "role": "Approver"
+ },
+ "departments": [
+  {
+   "id": "build",
+   "name": "Build lanes",
+   "color": "a1"
+  },
+  {
+   "id": "release",
+   "name": "Release and gate",
+   "color": "a4"
+  },
+  {
+   "id": "data",
+   "name": "Data truth",
+   "color": "a3"
+  },
+  {
+   "id": "outreach",
+   "name": "Outreach and mail",
+   "color": "a2"
+  },
+  {
+   "id": "intel",
+   "name": "Research",
+   "color": "a5"
+  },
+  {
+   "id": "quality",
+   "name": "Quality",
+   "color": "a1"
+  }
+ ],
+ "agents": [
+  {
+   "id": "forge",
+   "name": "Daniel",
+   "role": "Dashboard Builder",
+   "dept": "build",
+   "icon": "layers",
+   "status": "working",
+   "since": "-42m",
+   "task": "Charts that open the exact deals behind each bar",
+   "extraLoad": 2
+  },
+  {
+   "id": "mason",
+   "name": "Chloe",
+   "role": "Mobile Shell Builder",
+   "dept": "build",
+   "icon": "phone",
+   "status": "resting",
+   "since": "-6h",
+   "next": "+2d",
+   "nextNote": "Starts when the web app is signed off",
+   "task": "Parked on purpose"
+  },
+  {
+   "id": "keel",
+   "name": "Emma",
+   "role": "Release Captain",
+   "dept": "release",
+   "icon": "rocket",
+   "status": "working",
+   "since": "-18m",
+   "task": "Merging three finished lanes into the next release",
+   "extraLoad": 1
+  },
+  {
+   "id": "gate",
+   "name": "Henry",
+   "role": "Gate Keeper",
+   "dept": "release",
+   "icon": "shield",
+   "status": "working",
+   "since": "-9m",
+   "task": "Running the full test gate, 14 of 40 minutes",
+   "extraLoad": 1
+  },
+  {
+   "id": "smoke",
+   "name": "Grace",
+   "role": "Deploy Sentinel",
+   "dept": "release",
+   "icon": "radar",
+   "status": "idle",
+   "since": "-1h",
+   "next": "+25m",
+   "nextNote": "Starts when the gate passes"
+  },
+  {
+   "id": "ledger",
+   "name": "Edward",
+   "role": "Number Tracer",
+   "dept": "data",
+   "icon": "chart",
+   "status": "waiting",
+   "since": "-35m",
+   "task": "Needs your answer on which proposals count as sent",
+   "extraLoad": 1
+  },
+  {
+   "id": "prism",
+   "name": "Olivia",
+   "role": "Date Detective",
+   "dept": "data",
+   "icon": "doc",
+   "status": "working",
+   "since": "-12m",
+   "task": "Matching 10 undated proposals to document dates",
+   "extraLoad": 2
+  },
+  {
+   "id": "courier",
+   "name": "James",
+   "role": "Outreach Courier",
+   "dept": "outreach",
+   "icon": "mail",
+   "status": "idle",
+   "since": "-2h",
+   "next": "+1h",
+   "nextNote": "Next sequence step is due",
+   "extraLoad": 1
+  },
+  {
+   "id": "cadence",
+   "name": "Charlotte",
+   "role": "Sequence Composer",
+   "dept": "outreach",
+   "icon": "bolt",
+   "status": "working",
+   "since": "-27m",
+   "task": "Writing the second message of each sequence step",
+   "extraLoad": 2
+  },
+  {
+   "id": "scout",
+   "name": "Thomas",
+   "role": "Mail and Calendar Ranger",
+   "dept": "intel",
+   "icon": "eye",
+   "status": "idle",
+   "since": "-50m",
+   "next": "+3h",
+   "nextNote": "Starts after the weekly reset"
+  },
+  {
+   "id": "radar",
+   "name": "Alice",
+   "role": "Hourly Inbox Watch",
+   "dept": "intel",
+   "icon": "radar",
+   "status": "resting",
+   "since": "-14m",
+   "next": "+46m",
+   "nextNote": "Runs at the top of every hour"
+  },
+  {
+   "id": "warden",
+   "name": "George",
+   "role": "Regression Guardian",
+   "dept": "quality",
+   "icon": "shield",
+   "status": "working",
+   "since": "-1h",
+   "task": "Walking every page as every role",
+   "extraLoad": 3
+  },
+  {
+   "id": "gauge",
+   "name": "Lucy",
+   "role": "Branch Triage Marshal",
+   "dept": "quality",
+   "icon": "eye",
+   "status": "idle",
+   "since": "-3h"
+  }
+ ],
+ "log": [
+  {
+   "at": "-4m",
+   "who": "Henry",
+   "text": "Test gate at 14 of 40 minutes, no failures so far."
+  },
+  {
+   "at": "-12m",
+   "who": "Olivia",
+   "text": "Matched 6 of 10 undated proposals to a document date."
+  },
+  {
+   "at": "-18m",
+   "who": "Emma",
+   "text": "Merged the third lane, regenerated the generated docs."
+  },
+  {
+   "at": "-35m",
+   "who": "Edward",
+   "text": "Found the Sent figure counts one card per proposal; waiting for your rule on undated ones."
+  },
+  {
+   "at": "-42m",
+   "who": "Daniel",
+   "text": "Six of nine charts now open their deals."
+  },
+  {
+   "at": "-1h",
+   "who": "George",
+   "text": "Added a visual baseline for the sign-in page."
+  }
+ ]
+}

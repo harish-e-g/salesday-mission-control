@@ -4,3 +4,4 @@ mission.config.json
 .DS_Store
 /rows/
 /agents.json
+/team.config.json
