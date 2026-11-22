@@ -132,7 +132,7 @@ function state() {
   let agents = readJson(path.resolve(HERE, home(cfg.agentsFile || './demo/agents.json')), { running: 0, peers: 0, note: '' });
   const ROSTER = cfg.teamFile ? readJson(path.resolve(HERE, home(cfg.teamFile)), null) : null;
   const J = cfg.teamSource === 'claude-code' ? allJobs() : null;
-  const TEAM = cfg.teamSource === 'claude-code' ? (ROSTER ? buildLiveRoster(ROSTER, rows, J.jobs, J.sessionsWorking) : liveTeam(cfg)) : buildTeam(readJson(path.resolve(HERE, home(cfg.teamFile || './demo/team.json')), null), rows);
+  const TEAM = cfg.teamSource === 'claude-code' ? (ROSTER ? buildLiveRoster(ROSTER, rows, J.jobs, J.sessionsWorking, Date.now(), !!cfg.teamShowTasks) : liveTeam(cfg)) : buildTeam(readJson(path.resolve(HERE, home(cfg.teamFile || './demo/team.json')), null), rows);
   if (TEAM && TEAM.mode === 'roster-live') { const c = TEAM.counts; agents = { running: c.agentsWorking, working: c.sessionsWorking, idle: TEAM.agents.filter((x) => x.status !== 'working').length, peers: c.sessionsWorking, note: 'Live: ' + c.agentsWorking + ' AI agent job(s) running, ' + c.sessionsWorking + ' agentic AI session(s) working, ' + c.jobsToday + ' jobs in the last 24 hours.' }; }
   if (TEAM && TEAM.mode === 'live') { const c = TEAM.counts; agents = { running: c.agentsWorking, working: c.sessionsWorking, idle: TEAM.sessions.filter((x) => x.status !== 'working').length, peers: TEAM.sessions.filter((x) => x.status !== 'working').length, note: 'Live from Claude Code on this machine: ' + TEAM.sessions.length + ' session(s) active in the last 6 hours, ' + c.agentsWorking + ' sub-agent(s) working now.' }; }
   return {

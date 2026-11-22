@@ -115,6 +115,52 @@ const FL = (function () {
     blocks.forEach((b) => { nodes.push({ n: b.g.nodes[0], g: card(svg, b.g.nodes[0], xs[2], b.y, now) }); b.g.nodes.slice(1).forEach((s, k) => nodes.push({ n: s, g: card(svg, s, xs[3], b.y + k * pitch, now) })); });
     if (hooks) hooks(nodes, links); return { W, H, nodes, links };
   }
+  /* Compact lane layout for one screen: MASTER and Oliver stacked on the left, one lane per department on the right, three single lines per card.
+     Everything is drawn in one fixed box so the page scales it to fit the screen with no scrolling. Connectors end on the lane edge, never across text. */
+  const CWC = 240, CHC = 64;
+  function cardC(svg, n, x, y, now) {
+    const sv = C.sv, T = C.T(), dark = C.dark(), st = (n.kind === 'agent' || n.kind === 'session') ? n.a.status : n.kind === 'lead' ? 'working' : 'owner', dc = n.color;
+    const tone = st === 'working' ? T.a1 : st === 'waiting' ? T.a2 : st === 'resting' ? T.a3 : st === 'owner' ? T.a2 : T.ink3;
+    const g = sv('g', { transform: `translate(${x},${y})`, class: 'fcard', 'data-id': n.id, tabindex: 0, role: 'button', 'aria-label': n.name + ', ' + n.role + ', ' + n.dept }, svg);
+    sv('rect', { width: CWC, height: CHC, rx: 14, fill: dark ? '#10241e' : '#ffffff' }, g);
+    sv('rect', { width: CWC, height: CHC, rx: 14, fill: st === 'idle' ? T.ink3 : tone, opacity: st === 'idle' ? .06 : .11 }, g);
+    const edge = sv('rect', { width: CWC, height: CHC, rx: 14, fill: 'none', stroke: st === 'idle' ? T.ink3 : st === 'working' ? dc : tone, 'stroke-width': st === 'waiting' ? 2.6 : st === 'working' ? 2 : 1.4, opacity: st === 'idle' ? .55 : 1 }, g); if (st === 'waiting') edge.setAttribute('class', 'glowAmber');
+    sv('rect', { x: 0, y: 12, width: 4, height: CHC - 24, rx: 2, fill: st === 'idle' ? T.ink3 : dc, opacity: st === 'idle' ? .5 : 1 }, g);
+    if (st === 'working') { const p = sv('circle', { cx: 36, cy: CHC / 2, r: 24, class: 'ring', fill: 'none', stroke: tone, 'stroke-width': 2 }, g); p.style.animationDelay = (Math.random() * 2) + 's'; }
+    sv('circle', { cx: 36, cy: CHC / 2, r: 24, fill: 'none', stroke: tone, 'stroke-width': st === 'working' ? 3.4 : 2.2, opacity: st === 'idle' ? .6 : 1 }, g);
+    const cid = 'fk_' + n.id + '_' + Math.round(x) + '_' + Math.round(y), cp = sv('clipPath', { id: cid }, g); sv('circle', { cx: 36, cy: CHC / 2, r: 21 }, cp);
+    const holder = sv('g', { 'clip-path': `url(#${cid})`, opacity: st === 'idle' ? .5 : st === 'resting' ? .62 : 1 }, g), inner = sv('g', { transform: `translate(36 ${CHC / 2})` }, holder);
+    if (n.kind === 'owner') crown(inner, 21); else if (n.kind === 'session' || n.kind === 'lead') robot(inner, n.id, dc, 21); else face(inner, n.id, dc, 21);
+    if (st === 'resting') { sv('circle', { cx: 52, cy: 14, r: 7, fill: T.a3 }, g); sv('path', { d: 'M52.6 10.4a4 4 0 103.8 4.8a3.2 3.2 0 01-3.8-4.8z', fill: '#fff' }, g); }
+    const lines = [[n.name, 14, 600, T.ink, 16], [n.role, 11.5, 500, T.ink2, 24], [stat(n, now), 11, 600, tone, 28]]; let ty = 21;
+    for (const [t, fs, fw, fill, m] of lines) { const e = sv('text', { x: 70, y: ty, 'font-size': fs, 'font-weight': fw, fill }, g); e.textContent = fit(t, m); ty += 17; }
+    const human = n.kind === 'owner', lead = n.kind === 'lead' || n.kind === 'session', label = human ? 'MASTER' : lead ? 'AGENTIC AI' : 'AI AGENT', pw = human ? 62 : lead ? 74 : 62;
+    sv('rect', { x: CWC - pw - 10, y: -8, width: pw, height: 16, rx: 8, class: 'aip', fill: human ? T.a2 : lead ? T.a3 : (dark ? T.a1 : '#14201B') }, g);
+    const pt = sv('text', { x: CWC - pw / 2 - 10, y: 3, 'text-anchor': 'middle', 'font-size': 8.5, 'font-weight': 700, 'letter-spacing': '.06em', fill: human ? (T.onA2 || '#1B2210') : lead ? '#ffffff' : (dark ? '#06241c' : '#ffffff') }, g); pt.textContent = label;
+    return g;
+  }
+  const wrapWords = (s, n) => { const out = []; let cur = ''; for (const w of String(s).split(/\s+/)) { if ((cur + ' ' + w).trim().length > n && cur) { out.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); } if (cur) out.push(cur); return out; };
+  function compact(svg, m, now, hooks) {
+    const sv = C.sv, T = C.T(), P = 16, leftW = 236, gap = 34, titleW = 150, laneH = CHC + 16, pitch = laneH + 8, rows = m.groups.length;
+    const trunk = P + leftW + 34, laneX = trunk + 34, headX = laneX + titleW + 12, maxN = Math.max(1, ...m.groups.map((g) => g.nodes.length)), laneW = titleW + 12 + maxN * CWC + (maxN - 1) * gap + 16;
+    const top = P + 24, W = laneX + laneW + P, H = top + rows * pitch - 8 + P;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.removeAttribute('width'); svg.removeAttribute('height');
+    const lab = (t, x, y, color) => { const a = sv('text', { x, y, 'font-size': 12, 'font-weight': 600, 'letter-spacing': '.1em', fill: color }, svg); a.textContent = t; };
+    lab('MASTER AND AGENTIC AI', P, P + 6, T.a3); lab('AI AGENTS BY DEPARTMENT', laneX, P + 6, T.a1);
+    const midY = top + (rows * pitch - 8) / 2, my = midY - CHC - 22, oy = midY + 22, links = [], nodes = [];
+    links.push({ id: '__lead', g: link(svg, [[P + leftW / 2, my + CHC], [P + leftW / 2, oy]], T.a2, m.wait ? 'waiting' : 'idle'), chain: ['__owner', '__lead'], down: true });
+    m.groups.forEach((g, i) => {
+      const y = top + i * pitch, c = g.nodes[0].color; sv('rect', { x: laneX, y, width: laneW, height: laneH, rx: 18, fill: c, opacity: .08 }, svg); sv('rect', { x: laneX, y, width: laneW, height: laneH, rx: 18, fill: 'none', stroke: c, 'stroke-width': 1.3, opacity: .5 }, svg);
+      const tl = wrapWords(g.d.name.toUpperCase(), 17).slice(0, 2); tl.forEach((t, k) => { const e = sv('text', { x: laneX + 14, y: y + 26 + k * 15, 'font-size': 12, 'font-weight': 600, 'letter-spacing': '.04em', fill: c }, svg); e.textContent = t; });
+      const ce = sv('text', { x: laneX + 14, y: y + 26 + tl.length * 15 + 4, 'font-size': 11, 'font-weight': 500, fill: T.ink3 }, svg); ce.textContent = g.nodes.length + (g.nodes.length === 1 ? ' agent' : ' agents');
+      const cy = y + laneH / 2, h = g.nodes[0];
+      links.push({ id: h.id, g: link(svg, [[P + leftW, oy + CHC / 2], [trunk, oy + CHC / 2], [trunk, cy], [laneX, cy]], h.color, h.a.status), chain: ['__owner', '__lead', h.id] });
+      g.nodes.slice(1).forEach((s, k) => { const x0 = headX + k * (CWC + gap) + CWC; links.push({ id: s.id, g: link(svg, [[x0, cy], [x0 + gap, cy]], s.color, s.a.status), chain: ['__owner', '__lead', h.id, s.id] }); });
+    });
+    nodes.push({ n: m.owner, g: cardC(svg, m.owner, P, my, now) }); if (m.lead) nodes.push({ n: m.lead, g: cardC(svg, m.lead, P, oy, now) });
+    m.groups.forEach((g, i) => { const y = top + i * pitch + 8; g.nodes.forEach((n, k) => nodes.push({ n, g: cardC(svg, n, headX + k * (CWC + gap), y, now) })); });
+    if (hooks) hooks(nodes, links); return { W, H, nodes, links };
+  }
   /* Live mode: HUMAN | AGENTIC AI sessions | AI AGENTS (the sub-agents each session started). Real data only. */
   function sessions(svg, m, now, hooks) {
     const sv = C.sv, T = C.T(), P = 34, gap = 120, xs = [0, 1, 2].map((i) => P + i * (CW + gap)), W = xs[2] + CW + P, pitch = CH + GY, top = P + 96;
@@ -133,5 +179,5 @@ const FL = (function () {
     if (!blocks.length) { const e = sv('text', { x: W / 2, y: top + 60, 'text-anchor': 'middle', 'font-size': 20, fill: T.ink3 }, svg); e.textContent = 'No Claude Code session has been active in the last 6 hours.'; }
     if (hooks) hooks(nodes, links); return { W, H, nodes, links };
   }
-  return { init: (ctx) => { C = ctx; }, layered, sessions, card, face, robot, BEATS, CW, CH };
+  return { init: (ctx) => { C = ctx; }, layered, compact, sessions, card, face, robot, BEATS, CW, CH };
 })();
