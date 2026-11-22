@@ -41,7 +41,7 @@ Open `/team.html` (the "Agent team" button in the header). It is a live map of a
 
 Try the sample in a minute: `node server.js --demo`, then open `http://localhost:4378/team.html`. The names, roles and tasks in `demo/team.json` are made up.
 
-This project is free and open source under the MIT licence. Use it, change it, ship it, and build the same dashboard for your own AI agents.
+This project is proprietary. All rights reserved. To ask for a licence or a demo, contact the owner.
 
 ## Requirements
 
@@ -143,7 +143,7 @@ The `owner` field is also blanked. Masking is pattern based, so it cannot know w
 - **Quicksand**, used for interface text, is licensed under the SIL Open Font License 1.1.
 - **Codec Pro Regular**, used for headline numbers and the page title, is licensed under CC BY 4.0. Codec Pro is made available by Web Fonts (http://www.onlinewebfonts.com) under CC BY 4.0.
 
-Details are in `public/fonts/FONTS.md`. The SalesDay wordmark files and the partner logo in `public/brand/` are brand assets of their owners. They are **not** covered by the MIT licence: do not reuse them without permission.
+Details are in `public/fonts/FONTS.md`. The SalesDay wordmark files and the partner logo in `public/brand/` are brand assets of their owners. They are **not** covered by the proprietary licence: do not reuse them without permission.
 
 ## Licence
 
