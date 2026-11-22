@@ -27,7 +27,7 @@ It is one small Node file and one HTML page. There are no dependencies and no bu
 - **Shipped**: recent releases from your changelog, and a seven-day activity chart
 - **Worked on in the last 24 hours**
 
-## The AI agent team view (free to use)
+## The AI agent team view
 
 Open `/team.html` (the "Agent team" button in the header). It is a live map of an **AI team**, not an organisation chart: every card is an AI agent, the orchestrator on top is the **agentic AI** layer that plans, delegates, remembers, verifies and asks a human, and the only human on the map is the owner.
 
