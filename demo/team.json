@@ -2,8 +2,8 @@
  "_note": "Synthetic demo roster. Every name, role and task is made up. Times are relative so the page always looks live. Copy to team.config.json and edit to describe your own agents.",
  "lead": {
   "id": "atlas",
-  "name": "Oliver",
-  "role": "Chief Orchestrator",
+  "name": "Master",
+  "role": "Agentic AI orchestrator",
   "icon": "compass",
   "task": "Assigning work to the departments and checking every result",
   "since": "-3h"

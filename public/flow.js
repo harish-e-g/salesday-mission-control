@@ -30,6 +30,17 @@ const FL = (function () {
     sv('circle', { cx: -4.2, cy: -4, r: 1.4, fill: '#1d1d1d' }, f); sv('circle', { cx: 4.2, cy: -4, r: 1.4, fill: '#1d1d1d' }, f); sv('path', { d: 'M-3.6 1.2q3.6 3.2 7.2 0', fill: 'none', stroke: '#7a3b2e', 'stroke-width': 1.2, 'stroke-linecap': 'round' }, f);
     if (glasses) { sv('circle', { cx: -4.2, cy: -4, r: 3.7, fill: 'none', stroke: '#222', 'stroke-width': 1 }, f); sv('circle', { cx: 4.2, cy: -4, r: 3.7, fill: 'none', stroke: '#222', 'stroke-width': 1 }, f); sv('path', { d: 'M-0.5 -4h1', stroke: '#222', 'stroke-width': 1 }, f); }
   }
+  /* The master is the agentic AI, so it is drawn as a robot, never as a person. */
+  function robot(g, id, color, r) {
+    const sv = C.sv, T = C.T(), f = sv('g', { transform: `scale(${r / 28})` }, g), dark = C.dark();
+    sv('circle', { r: 28, fill: color, opacity: .22 }, f);
+    sv('line', { x1: 0, y1: -14, x2: 0, y2: -22, stroke: color, 'stroke-width': 2.4, 'stroke-linecap': 'round' }, f); sv('circle', { cx: 0, cy: -24, r: 3.2, fill: '#2fe0a8' }, f);
+    sv('rect', { x: -19, y: -7, width: 4.5, height: 10, rx: 2, fill: color }, f); sv('rect', { x: 14.5, y: -7, width: 4.5, height: 10, rx: 2, fill: color }, f);
+    sv('rect', { x: -15, y: 12, width: 30, height: 16, rx: 7, fill: color }, f); sv('circle', { cx: 0, cy: 20, r: 2.8, fill: '#2fe0a8' }, f);
+    sv('rect', { x: -14.5, y: -15, width: 29, height: 26, rx: 8, fill: color }, f);
+    sv('rect', { x: -10.5, y: -10.5, width: 21, height: 15, rx: 5, fill: '#1b1340' }, f);
+    sv('circle', { cx: -4.5, cy: -3, r: 2.7, fill: '#8fffd6' }, f); sv('circle', { cx: 4.5, cy: -3, r: 2.7, fill: '#8fffd6' }, f); sv('path', { d: 'M-4 3.2h8', stroke: '#8fffd6', 'stroke-width': 1.6, 'stroke-linecap': 'round' }, f);
+  }
   const rounded = (P, r) => {
     P = P.filter((q, i) => i === 0 || Math.hypot(q[0] - P[i - 1][0], q[1] - P[i - 1][1]) > .5); if (P.length < 3) return `M${P[0][0]} ${P[0][1]}L${P[P.length - 1][0]} ${P[P.length - 1][1]}`;
     let d = `M${P[0][0]} ${P[0][1]}`; for (let i = 1; i < P.length - 1; i++) { const a = P[i - 1], b = P[i], c = P[i + 1], l1 = Math.hypot(b[0] - a[0], b[1] - a[1]), l2 = Math.hypot(c[0] - b[0], c[1] - b[1]), rr = Math.min(r, l1 / 2, l2 / 2); d += `L${b[0] - (b[0] - a[0]) / l1 * rr} ${b[1] - (b[1] - a[1]) / l1 * rr}Q${b[0]} ${b[1]} ${b[0] + (c[0] - b[0]) / l2 * rr} ${b[1] + (c[1] - b[1]) / l2 * rr}`; }
@@ -67,7 +78,7 @@ const FL = (function () {
     if (st === 'working') { const p = sv('circle', { cx: 44, cy: CH / 2, r: 30, class: 'ring', fill: 'none', stroke: tone, 'stroke-width': 2 }, g); p.style.animationDelay = (Math.random() * 2) + 's'; }
     sv('circle', { cx: 44, cy: CH / 2, r: 30, fill: 'none', stroke: tone, 'stroke-width': st === 'working' ? 4 : 2.6, opacity: st === 'idle' ? .6 : 1 }, g);
     const cid = 'fc_' + n.id + '_' + Math.round(x) + '_' + Math.round(y), cp = sv('clipPath', { id: cid }, g); sv('circle', { cx: 44, cy: CH / 2, r: 26 }, cp);
-    const holder = sv('g', { 'clip-path': `url(#${cid})`, opacity: st === 'idle' ? .5 : st === 'resting' ? .62 : 1 }, g), inner = sv('g', { transform: `translate(44 ${CH / 2})` }, holder); face(inner, n.id, dc, 26);
+    const holder = sv('g', { 'clip-path': `url(#${cid})`, opacity: st === 'idle' ? .5 : st === 'resting' ? .62 : 1 }, g), inner = sv('g', { transform: `translate(44 ${CH / 2})` }, holder); if (n.kind === 'session' || n.kind === 'lead') robot(inner, n.id, dc, 26); else face(inner, n.id, dc, 26);
     if (st === 'resting') { sv('circle', { cx: 66, cy: 20, r: 9, fill: T.a3 }, g); sv('path', { d: 'M66.8 15.5a5 5 0 105 6a4 4 0 01-5-6z', fill: '#fff' }, g); }
     const lines = [[n.name, 15, 600, T.ink, 17], [n.role, 12, 500, T.ink2, 25], [n.dept, 11, 600, st === 'idle' ? T.ink3 : dc, 26], [stat(n, now), 11.5, 600, tone, 26]];
     let ty = 23; for (const [t, fs, fw, fill, m] of lines) { const e = sv('text', { x: 84, y: ty, 'font-size': fs, 'font-weight': fw, fill }, g); e.textContent = fit(t, m); ty += 18; }
@@ -110,19 +121,20 @@ const FL = (function () {
   /* Live mode: HUMAN | AGENTIC AI sessions | AI AGENTS (the sub-agents each session started). Real data only. */
   function sessions(svg, m, now, hooks) {
     const sv = C.sv, T = C.T(), P = 34, gap = 120, xs = [0, 1, 2].map((i) => P + i * (CW + gap)), W = xs[2] + CW + P, pitch = CH + GY, top = P + 96;
-    let y = top; const blocks = m.sessions.map((s) => { const n = Math.max(1, s.kids.length), h = n * pitch - GY, b = { s, y, h }; y += h + 46; return b; });
-    const bot = Math.max(y - 46, top + CH), H = bot + P + 18; svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', W); svg.setAttribute('height', H);
+    let y = top; const blocks = m.sessions.map((s) => { const n = Math.max(1, s.kids.length), h = n * pitch - GY + (s.hidden ? 30 : 0), b = { s, y, h }; y += h + 46; return b; });
+    const bot = Math.max(y - 46, top + CH), H = bot + P + 40; svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', W); svg.setAttribute('height', H);
     const band = (x, yy, w, h, color) => { sv('rect', { x, y: yy, width: w, height: h, rx: 24, fill: color, opacity: .07 }, svg); sv('rect', { x, y: yy, width: w, height: h, rx: 24, fill: 'none', stroke: color, 'stroke-width': 1.4, opacity: .55 }, svg); };
     band(xs[1] - 16, P - 8, CW + 32, bot - P + 30, T.a3); band(xs[2] - 16, P - 8, CW + 32, bot - P + 30, T.a1);
     const lab = (t, sub, x, yy, color) => { const a = sv('text', { x, y: yy, 'font-size': 15, 'font-weight': 600, 'letter-spacing': '.1em', fill: color }, svg); a.textContent = t; const b = sv('text', { x, y: yy + 20, 'font-size': 13, fill: T.ink2 }, svg); b.textContent = sub; };
     lab('HUMAN', 'decides and approves', xs[0], P + 12, T.a2); lab('AGENTIC AI', 'sessions that plan and delegate', xs[1], P + 12, T.a3); lab('AI AGENTS', 'sub-agents each session started', xs[2], P + 12, T.a1);
     const mid = (top + bot) / 2 - CH / 2, trunk = xs[0] + CW + gap / 2, links = [], nodes = [];
-    blocks.forEach((b) => { const sy = b.y + (b.h - CH) / 2; b.sy = sy; links.push({ id: b.s.node.id, g: link(svg, [[xs[0] + CW, mid + CH / 2], [trunk, mid + CH / 2], [trunk, sy + CH / 2], [xs[1], sy + CH / 2]], T.a3, b.s.node.a.status), chain: ['__owner', b.s.node.id] });
+    blocks.forEach((b) => { const sy = b.y + (b.h - (b.s.hidden ? 30 : 0) - CH) / 2; b.sy = sy; links.push({ id: b.s.node.id, g: link(svg, [[xs[0] + CW, mid + CH / 2], [trunk, mid + CH / 2], [trunk, sy + CH / 2], [xs[1], sy + CH / 2]], T.a3, b.s.node.a.status), chain: ['__owner', b.s.node.id] });
       const bx = xs[1] + CW + gap / 2; b.s.kids.forEach((k, i) => { const ky = b.y + i * pitch; links.push({ id: k.id, g: link(svg, [[xs[1] + CW, sy + CH / 2], [bx, sy + CH / 2], [bx, ky + CH / 2], [xs[2], ky + CH / 2]], T.a1, k.a.status), chain: ['__owner', b.s.node.id, k.id] }); }); });
     nodes.push({ n: m.owner, g: card(svg, m.owner, xs[0], mid, now) });
-    blocks.forEach((b) => { nodes.push({ n: b.s.node, g: card(svg, b.s.node, xs[1], b.sy, now) }); b.s.kids.forEach((k, i) => nodes.push({ n: k, g: card(svg, k, xs[2], b.y + i * pitch, now) })); });
+    blocks.forEach((b) => { nodes.push({ n: b.s.node, g: card(svg, b.s.node, xs[1], b.sy, now) }); b.s.kids.forEach((k, i) => nodes.push({ n: k, g: card(svg, k, xs[2], b.y + i * pitch, now) })); if (b.s.hidden) { const t = sv('text', { x: xs[2] + 8, y: b.y + b.s.kids.length * pitch - GY + 26, 'font-size': 14, 'font-weight': 600, fill: T.ink3 }, svg); t.textContent = '+ ' + b.s.hidden + ' more AI agents today'; } });
+    if (m.others) { const t = sv('text', { x: xs[1] + 8, y: bot + 24, 'font-size': 14, 'font-weight': 600, fill: T.ink3 }, svg); t.textContent = '+ ' + m.others + ' other sessions, no AI agents'; }
     if (!blocks.length) { const e = sv('text', { x: W / 2, y: top + 60, 'text-anchor': 'middle', 'font-size': 20, fill: T.ink3 }, svg); e.textContent = 'No Claude Code session has been active in the last 6 hours.'; }
     if (hooks) hooks(nodes, links); return { W, H, nodes, links };
   }
-  return { init: (ctx) => { C = ctx; }, layered, sessions, card, face, BEATS, CW, CH };
+  return { init: (ctx) => { C = ctx; }, layered, sessions, card, face, robot, BEATS, CW, CH };
 })();
